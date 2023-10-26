@@ -35,3 +35,18 @@ void ABaseEntity::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 
 }
 
+float ABaseEntity::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	if (DamageAmount > Health)
+	{
+		Health = 0;
+	}
+	else
+	{
+		Health -= DamageAmount;
+	}
+
+	UE_LOG(LogTemp, Warning, TEXT("BaseEntity Health: %i\n"), Health);
+
+	return DamageAmount;
+}

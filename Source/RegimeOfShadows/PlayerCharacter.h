@@ -5,7 +5,10 @@
 #include "CoreMinimal.h"
 #include "BaseEntity.h"
 #include "InputActionValue.h"
+#include "Projectile.h"
 #include "PlayerCharacter.generated.h"
+
+class AProjectile;
 
 UENUM(BlueprintType)
 enum class Element
@@ -68,6 +71,9 @@ private:
 
 	Element ActiveElement;
 
+	UPROPERTY(EditDefaultsOnly, Category = Abilities)
+	TSubclassOf<AProjectile> BasicAttackFireProj;
+
 public:
 	UCameraComponent* GetCameraComponent() const { return Camera; }
 
@@ -91,6 +97,18 @@ private:
 	void BasicAbility(const FInputActionValue& Value);
 	void StrongAbility(const FInputActionValue& Value);
 
+	void BasicAttackFire();
+	void BasicAbilityFire();
+	void StrongAbilityFire();
+
+	void BasicAttackIce();
+	void BasicAbilityIce();
+	void StrongAbilityIce();
+
+	void BasicAttackElectric();
+	void BasicAbilityElectric();
+	void StrongAbilityElectric();
+
 	void SwapToFire(const FInputActionValue& Value);
 	void SwapToIce(const FInputActionValue& Value);
 	void SwapToElectric(const FInputActionValue& Value);
@@ -98,6 +116,5 @@ private:
 	void Overcharge(const FInputActionValue& Value);
 
 	void LevelUp();
-
 
 };
