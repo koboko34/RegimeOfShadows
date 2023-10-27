@@ -30,28 +30,28 @@ float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AC
 	return DamageAmount;
 }
 
-void AEnemy::ApplyBurning(float Duration)
+void AEnemy::ApplyBurning()
 {
 	StatusEffects.Burning = true;
-	GetWorldTimerManager().SetTimer(ClearBurningHandle, ClearBurningDelegate, Duration, false);
+	GetWorldTimerManager().SetTimer(ClearBurningHandle, ClearBurningDelegate, StatusDuration, false);
 }
 
-void AEnemy::ApplyWet(float Duration)
+void AEnemy::ApplyWet()
 {
 	StatusEffects.Wet = true;
-	GetWorldTimerManager().SetTimer(ClearWetHandle, ClearWetDelegate, Duration, false);
+	GetWorldTimerManager().SetTimer(ClearWetHandle, ClearWetDelegate, StatusDuration, false);
 }
 
-void AEnemy::ApplyFrost(float Duration)
+void AEnemy::ApplyFrost()
 {
 	StatusEffects.Frost = true;
-	GetWorldTimerManager().SetTimer(ClearFrostHandle, ClearFrostDelegate, Duration, false);
+	GetWorldTimerManager().SetTimer(ClearFrostHandle, ClearFrostDelegate, StatusDuration, false);
 }
 
-void AEnemy::ApplyCharged(float Duration)
+void AEnemy::ApplyCharged()
 {
 	StatusEffects.Charged = true;
-	GetWorldTimerManager().SetTimer(ClearChargedHandle, ClearChargedDelegate, Duration, false);
+	GetWorldTimerManager().SetTimer(ClearChargedHandle, ClearChargedDelegate, StatusDuration, false);
 }
 
 void AEnemy::ClearStatusEffects()
@@ -89,6 +89,7 @@ void AEnemy::ClearBurning()
 
 void AEnemy::ClearWet()
 {
+	UE_LOG(LogTemp, Warning, TEXT("Clearing Wet!"));
 	StatusEffects.Wet = false;
 }
 

@@ -30,10 +30,10 @@ public:
 public:
 	StatusEffects StatusEffects;
 
-	void ApplyBurning(float Duration);
-	void ApplyWet(float Duration);
-	void ApplyFrost(float Duration);
-	void ApplyCharged(float Duration);
+	void ApplyBurning();
+	void ApplyWet();
+	void ApplyFrost();
+	void ApplyCharged();
 	void ClearStatusEffects();
 
 	void StartDOT();
@@ -42,6 +42,8 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = Stats, meta = (AllowPrivateAccess = true))
 	int ExpOnKill;
 
+	UPROPERTY(VisibleAnywhere, Category = Stats, meta = (AllowPrivateAccess = true))
+	int StatusDuration = 5;
 	UPROPERTY(VisibleAnywhere, Category = Stats, meta = (AllowPrivateAccess = true))
 	int DamageOnDOT = 1;
 	UPROPERTY(VisibleAnywhere, Category = Stats, meta = (AllowPrivateAccess = true))

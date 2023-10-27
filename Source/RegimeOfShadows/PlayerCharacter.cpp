@@ -195,6 +195,16 @@ void APlayerCharacter::BasicAttackIce()
 
 void APlayerCharacter::BasicAbilityIce()
 {
+	FActorSpawnParameters Params;
+	Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	AProjectile* Proj = GetWorld()->SpawnActor<AProjectile>(
+		BasicAbilityWaterProj,
+		Camera->GetComponentLocation() + Camera->GetForwardVector() * 200,
+		Camera->GetComponentRotation(),
+		Params);
+
+	if (Proj)
+		Proj->SetOwner(this);
 }
 
 void APlayerCharacter::StrongAbilityIce()

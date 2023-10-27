@@ -78,6 +78,9 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = FireAbilities, meta = (AllowPrivateAccess))
 	TSubclassOf<AProjectile> BasicAttackFireProj;
 
+	UPROPERTY(EditDefaultsOnly, Category = WaterAbilities, meta = (AllowPrivateAccess))
+	TSubclassOf<AProjectile> BasicAbilityWaterProj;
+
 	UPROPERTY(EditDefaultsOnly, Category = ElectricAbilities, meta = (AllowPrivateAccess))
 	TSubclassOf<AActor> EnemyClass;
 	UPROPERTY(EditDefaultsOnly, Category = ElectricAbilities, meta = (AllowPrivateAccess))
