@@ -9,6 +9,8 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Enemy.h"
+#include "Projectile.h"
+#include "SnowGlobe.h"
 
 APlayerCharacter::APlayerCharacter()
 {
@@ -55,6 +57,7 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 		EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Triggered, this, &APlayerCharacter::Sprint);
 		EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Completed, this, &APlayerCharacter::StopSprint);
 
+		EnhancedInputComponent->BindAction(ToggleMapAction, ETriggerEvent::Started, this, &APlayerCharacter::ToggleMap);
 		EnhancedInputComponent->BindAction(DodgeAction, ETriggerEvent::Started, this, &APlayerCharacter::Dodge);
 		EnhancedInputComponent->BindAction(OverchargeAction, ETriggerEvent::Started, this, &APlayerCharacter::Overcharge);
 		EnhancedInputComponent->BindAction(BasicAttackAction, ETriggerEvent::Started, this, &APlayerCharacter::BasicAttack);
@@ -71,6 +74,13 @@ void APlayerCharacter::AddExp(int ExpToAdd)
 	Experience += ExpToAdd;
 	if (Experience > ExpToNextLevel)
 		LevelUp();
+}
+
+void APlayerCharacter::AddMana(int ManaToAdd)
+{
+	Mana = std::min(MaxMana, Mana + ManaToAdd);
+
+	UE_LOG(LogTemp, Warning, TEXT("Mana: %i"), Mana);
 }
 
 void APlayerCharacter::Move(const FInputActionValue& Value)
@@ -110,6 +120,10 @@ void APlayerCharacter::Dodge(const FInputActionValue& Value)
 }
 
 void APlayerCharacter::Interact(const FInputActionValue& Value)
+{
+}
+
+void APlayerCharacter::ToggleMap(const FInputActionValue& Value)
 {
 }
 
@@ -169,46 +183,68 @@ void APlayerCharacter::StrongAbility(const FInputActionValue& Value)
 
 void APlayerCharacter::BasicAttackFire()
 {
-	FActorSpawnParameters Params;
-	Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	AProjectile* Proj = GetWorld()->SpawnActor<AProjectile>(
-		BasicAttackFireProj,
-		Camera->GetComponentLocation() + Camera->GetForwardVector() * 200,
-		Camera->GetComponentRotation(),
-		Params);
-	
-	if (Proj)
-		Proj->SetOwner(this);
+	SpawnProjectile(BasicAttackFireProj);
 }
 
 void APlayerCharacter::BasicAbilityFire()
 {
+	if (Mana < FireBasicManaCost)
+		return;
+
+	UseMana(FireBasicManaCost);
 }
 
 void APlayerCharacter::StrongAbilityFire()
 {
+	if (Mana < FireStrongManaCost)
+		return;
+
+	UseMana(FireStrongManaCost);
 }
 
 void APlayerCharacter::BasicAttackIce()
 {
+	SpawnProjectile(BasicAttackIceProj);
 }
 
 void APlayerCharacter::BasicAbilityIce()
 {
-	FActorSpawnParameters Params;
-	Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	AProjectile* Proj = GetWorld()->SpawnActor<AProjectile>(
-		BasicAbilityWaterProj,
-		Camera->GetComponentLocation() + Camera->GetForwardVector() * 200,
-		Camera->GetComponentRotation(),
-		Params);
+	if (Mana < WaterAbilityManaCost)
+		return;
 
-	if (Proj)
-		Proj->SetOwner(this);
+	UseMana(WaterAbilityManaCost);
+	SpawnProjectile(BasicAbilityWaterProj);
 }
 
 void APlayerCharacter::StrongAbilityIce()
 {
+	if (Mana < SnowGlobeManaCost)
+		return;
+
+	UseMana(SnowGlobeManaCost);
+	
+	FActorSpawnParameters Params;
+	Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	FHitResult HitResult;
+	FCollisionQueryParams CollisionQueryParams;
+	CollisionQueryParams.AddIgnoredActor(this);
+	GetWorld()->LineTraceSingleByChannel(
+		HitResult,
+		GetActorLocation(),
+		GetActorLocation() + (GetActorUpVector() * 200 * -1),
+		ECollisionChannel::ECC_WorldStatic,
+		CollisionQueryParams
+	);
+
+	DrawDebugLine(GetWorld(), GetActorLocation(), GetActorLocation() + (GetActorUpVector() * 200 * -1), FColor::Red, false, 5.f);
+	
+	FVector SpawnLocation = GetActorLocation();
+	if (HitResult.bBlockingHit)
+	{
+		SpawnLocation = HitResult.ImpactPoint;
+	}
+
+	GetWorld()->SpawnActor<ASnowGlobe>(SnowGlobeClass, SpawnLocation, FRotator::ZeroRotator, Params);
 }
 
 void APlayerCharacter::BasicAttackElectric()
@@ -217,6 +253,11 @@ void APlayerCharacter::BasicAttackElectric()
 
 void APlayerCharacter::BasicAbilityElectric()
 {
+	if (Mana < ElectricBasicManaCost)
+		return;
+
+	UseMana(ElectricBasicManaCost);
+	
 	FHitResult OutHit;
 	FCollisionQueryParams Params;
 	Params.AddIgnoredActor(this);
@@ -232,6 +273,10 @@ void APlayerCharacter::BasicAbilityElectric()
 
 void APlayerCharacter::StrongAbilityElectric()
 {
+	if (Mana < ElectricStrongManaCost)
+		return;
+
+	UseMana(ElectricStrongManaCost);
 }
 
 void APlayerCharacter::SwapToFire(const FInputActionValue& Value)
@@ -256,6 +301,12 @@ void APlayerCharacter::Overcharge(const FInputActionValue& Value)
 {
 }
 
+void APlayerCharacter::UseMana(int ManaToUse)
+{
+	Mana -= ManaToUse;
+	UE_LOG(LogTemp, Warning, TEXT("%i mana left."), Mana);
+}
+
 void APlayerCharacter::LevelUp()
 {
 	Level++;
@@ -275,8 +326,20 @@ void APlayerCharacter::ElectricChainRecursive(AActor* HitActor, TArray<AActor*>&
 {
 	HitActors.Add(HitActor);
 
-	// apply effects to this HitEnemy
+	// apply effects to this HitActor
+	AEnemy* Enemy = Cast<AEnemy>(HitActor);
+	if (Enemy)
+	{
+		if (Enemy->StatusEffects.Burning)
+		{
+			UGameplayStatics::ApplyDamage(HitActor, ElectricChainDamage * ElectricChainOverchargeMultiplier, GetController(), this, UDamageType::StaticClass());
+			Enemy->ClearStatusEffects();
+			return;
+		}
+		Enemy->ClearStatusEffects();
+	}
 	UGameplayStatics::ApplyDamage(HitActor, ElectricChainDamage, GetController(), this, UDamageType::StaticClass());
+
 
 	TArray<FHitResult> HitResults;
 	FCollisionObjectQueryParams Params;
@@ -295,7 +358,6 @@ void APlayerCharacter::ElectricChainRecursive(AActor* HitActor, TArray<AActor*>&
 	DrawDebugSphere(GetWorld(), HitActor->GetActorLocation(), ElectricChainSpreadRadius, 16, FColor::Purple, false, 5.f);
 
 	int Count = 0;
-	AEnemy* Enemy;
 	for (const FHitResult& HitResult : HitResults)
 	{
 		if (HitActors.Contains(HitResult.GetActor()))
@@ -316,4 +378,18 @@ void APlayerCharacter::ElectricChainRecursive(AActor* HitActor, TArray<AActor*>&
 		if (Count > 1)
 			return;
 	}
+}
+
+void APlayerCharacter::SpawnProjectile(TSubclassOf<AProjectile> ProjectileToSpawn)
+{
+	FActorSpawnParameters Params;
+	Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	AProjectile* Proj = GetWorld()->SpawnActor<AProjectile>(
+		ProjectileToSpawn,
+		Camera->GetComponentLocation() + Camera->GetForwardVector() * 200,
+		Camera->GetComponentRotation(),
+		Params);
+
+	if (Proj)
+		Proj->SetOwner(this);
 }

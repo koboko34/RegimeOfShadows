@@ -27,6 +27,9 @@ public:
 
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 
+protected:
+	virtual void BeginPlay() override;
+
 public:
 	StatusEffects StatusEffects;
 
@@ -36,8 +39,6 @@ public:
 	void ApplyCharged();
 	void ClearStatusEffects();
 
-	void StartDOT();
-
 private:
 	UPROPERTY(VisibleAnywhere, Category = Stats, meta = (AllowPrivateAccess = true))
 	int ExpOnKill;
@@ -45,12 +46,14 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = Stats, meta = (AllowPrivateAccess = true))
 	int StatusDuration = 5;
 	UPROPERTY(VisibleAnywhere, Category = Stats, meta = (AllowPrivateAccess = true))
-	int DamageOnDOT = 1;
+	int FireDamageOnDOT = 1;
 	UPROPERTY(VisibleAnywhere, Category = Stats, meta = (AllowPrivateAccess = true))
-	int DOTDuration = 5;
+	int ElectricDamageOnDOT = 1;
 	int DOTRemainingDuration;
 	UPROPERTY(VisibleAnywhere, Category = Stats, meta = (AllowPrivateAccess = true))
-	int DOTInterval = 1;
+	int FireDOTInterval = 1;
+	UPROPERTY(VisibleAnywhere, Category = Stats, meta = (AllowPrivateAccess = true))
+	int ElectricDOTInterval = 2;
 
 	FTimerHandle ClearBurningHandle;
 	FTimerHandle ClearWetHandle;
@@ -80,6 +83,7 @@ private:
 	UFUNCTION()
 	void ClearCharged();
 
+	void StartDOT();
 	UFUNCTION()
 	void ApplyDOT();
 	

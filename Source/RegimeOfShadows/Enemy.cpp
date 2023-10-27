@@ -8,7 +8,6 @@
 AEnemy::AEnemy()
 {
 	CalculateKillExp();
-	ClearStatusEffects();
 
 	ClearBurningDelegate.BindUObject(this, &AEnemy::ClearBurning);
 	ClearWetDelegate.BindUObject(this, &AEnemy::ClearWet);
@@ -16,6 +15,13 @@ AEnemy::AEnemy()
 	ClearChargedDelegate.BindUObject(this, &AEnemy::ClearCharged);
 
 	ApplyDOTDelegate.BindUObject(this, &AEnemy::ApplyDOT);
+}
+
+void AEnemy::BeginPlay()
+{
+	Super::BeginPlay();
+
+	ClearStatusEffects();
 }
 
 float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
@@ -32,25 +38,31 @@ float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AC
 
 void AEnemy::ApplyBurning()
 {
+	ClearStatusEffects();
 	StatusEffects.Burning = true;
+	StartDOT();
 	GetWorldTimerManager().SetTimer(ClearBurningHandle, ClearBurningDelegate, StatusDuration, false);
 }
 
 void AEnemy::ApplyWet()
 {
+	ClearStatusEffects();
 	StatusEffects.Wet = true;
 	GetWorldTimerManager().SetTimer(ClearWetHandle, ClearWetDelegate, StatusDuration, false);
 }
 
 void AEnemy::ApplyFrost()
 {
+	ClearStatusEffects();
 	StatusEffects.Frost = true;
 	GetWorldTimerManager().SetTimer(ClearFrostHandle, ClearFrostDelegate, StatusDuration, false);
 }
 
 void AEnemy::ApplyCharged()
 {
+	ClearStatusEffects();
 	StatusEffects.Charged = true;
+	StartDOT();
 	GetWorldTimerManager().SetTimer(ClearChargedHandle, ClearChargedDelegate, StatusDuration, false);
 }
 
@@ -61,6 +73,8 @@ void AEnemy::ClearStatusEffects()
 	StatusEffects.Frost = false;
 	StatusEffects.Charged = false;
 
+	GetWorldTimerManager().ClearAllTimersForObject(this);
+	/*
 	if (ClearBurningHandle.IsValid())
 		GetWorldTimerManager().ClearTimer(ClearBurningHandle);
 	if (ClearWetHandle.IsValid())
@@ -69,6 +83,9 @@ void AEnemy::ClearStatusEffects()
 		GetWorldTimerManager().ClearTimer(ClearFrostHandle);
 	if (ClearChargedHandle.IsValid())
 		GetWorldTimerManager().ClearTimer(ClearChargedHandle);
+	if (ApplyDOTHandle.IsValid())
+		GetWorldTimerManager().ClearTimer(ApplyDOTHandle);
+	*/
 }
 
 void AEnemy::GiveKillExp()
@@ -89,7 +106,6 @@ void AEnemy::ClearBurning()
 
 void AEnemy::ClearWet()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Clearing Wet!"));
 	StatusEffects.Wet = false;
 }
 
@@ -105,12 +121,21 @@ void AEnemy::ClearCharged()
 
 void AEnemy::StartDOT()
 {
+	float DOTInterval = StatusEffects.Burning ? FireDOTInterval : ElectricDOTInterval;
 	GetWorldTimerManager().SetTimer(ApplyDOTHandle, ApplyDOTDelegate, DOTInterval, true);
-	DOTRemainingDuration = DOTDuration;
+	DOTRemainingDuration = StatusDuration;
 }
 
 void AEnemy::ApplyDOT()
 {
+	if (DOTRemainingDuration <= 0 || (!StatusEffects.Burning && !StatusEffects.Charged))
+	{
+		GetWorldTimerManager().ClearTimer(ApplyDOTHandle);
+		return;
+	}
+	
+	float DOTInterval = StatusEffects.Burning ? FireDOTInterval : ElectricDOTInterval;
+	int DamageOnDOT = StatusEffects.Burning ? FireDamageOnDOT : ElectricDamageOnDOT;
 	DOTRemainingDuration -= DOTInterval;
 
 	UGameplayStatics::ApplyDamage(
@@ -119,9 +144,4 @@ void AEnemy::ApplyDOT()
 		UGameplayStatics::GetPlayerController(this, 0),
 		UGameplayStatics::GetPlayerCharacter(this, 0),
 		UDamageType::StaticClass());
-
-	if (DOTRemainingDuration <= 0)
-	{
-		GetWorldTimerManager().ClearTimer(ApplyDOTHandle);
-	}
 }

@@ -13,7 +13,7 @@ AWaterBasicProjectile::AWaterBasicProjectile()
 void AWaterBasicProjectile::OnCollision(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& Hit)
 {
 	TArray<FHitResult> HitResults;
-	HandleExplosion(HitResults, true, FColor::Cyan);
+	HandleExplosion(HitResults, true, FColor::Blue);
 
 	AEnemy* Enemy;
 	for (const FHitResult& HitResult : HitResults)

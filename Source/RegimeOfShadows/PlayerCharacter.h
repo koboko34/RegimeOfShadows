@@ -5,7 +5,6 @@
 #include "CoreMinimal.h"
 #include "BaseEntity.h"
 #include "InputActionValue.h"
-#include "Projectile.h"
 #include "PlayerCharacter.generated.h"
 
 class AProjectile;
@@ -13,6 +12,7 @@ class UCameraComponent;
 class UInputMappingContext;
 class UInputAction;
 class AEnemy;
+class ASnowGlobe;
 
 UENUM(BlueprintType)
 enum class Element
@@ -48,6 +48,8 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* DodgeAction;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* ToggleMapAction;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* OverchargeAction;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* BasicAttackAction;
@@ -77,9 +79,21 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category = FireAbilities, meta = (AllowPrivateAccess))
 	TSubclassOf<AProjectile> BasicAttackFireProj;
+	UPROPERTY(EditDefaultsOnly, Category = FireAbilities, meta = (AllowPrivateAccess))
+	int FireBasicManaCost = 15;
+	UPROPERTY(EditDefaultsOnly, Category = FireAbilities, meta = (AllowPrivateAccess))
+	int FireStrongManaCost = 20;
 
 	UPROPERTY(EditDefaultsOnly, Category = WaterAbilities, meta = (AllowPrivateAccess))
+	TSubclassOf<AProjectile> BasicAttackIceProj;
+	UPROPERTY(EditDefaultsOnly, Category = WaterAbilities, meta = (AllowPrivateAccess))
 	TSubclassOf<AProjectile> BasicAbilityWaterProj;
+	UPROPERTY(EditDefaultsOnly, Category = WaterAbilities, meta = (AllowPrivateAccess))
+	int WaterAbilityManaCost = 2;
+	UPROPERTY(EditDefaultsOnly, Category = WaterAbilities, meta = (AllowPrivateAccess))
+	TSubclassOf<ASnowGlobe> SnowGlobeClass;
+	UPROPERTY(EditDefaultsOnly, Category = WaterAbilities, meta = (AllowPrivateAccess))
+	int SnowGlobeManaCost = 5;
 
 	UPROPERTY(EditDefaultsOnly, Category = ElectricAbilities, meta = (AllowPrivateAccess))
 	TSubclassOf<AActor> EnemyClass;
@@ -87,6 +101,12 @@ private:
 	int ElectricChainDamage = 10;
 	UPROPERTY(EditDefaultsOnly, Category = ElectricAbilities, meta = (AllowPrivateAccess))
 	float ElectricChainSpreadRadius = 300;
+	UPROPERTY(EditDefaultsOnly, Category = ElectricAbilities, meta = (AllowPrivateAccess))
+	float ElectricChainOverchargeMultiplier = 3.f;
+	UPROPERTY(EditDefaultsOnly, Category = ElectricAbilities, meta = (AllowPrivateAccess))
+	int ElectricBasicManaCost = 5;
+	UPROPERTY(EditDefaultsOnly, Category = ElectricAbilities, meta = (AllowPrivateAccess))
+	int ElectricStrongManaCost = 15;
 
 public:
 	UCameraComponent* GetCameraComponent() const { return Camera; }
@@ -98,6 +118,7 @@ protected:
 
 public:
 	void AddExp(int ExpToAdd);
+	void AddMana(int ManaToAdd);
 
 private:
 	void Move(const FInputActionValue& Value);
@@ -106,6 +127,7 @@ private:
 	void StopSprint(const FInputActionValue& Value);
 	void Dodge(const FInputActionValue& Value);
 	void Interact(const FInputActionValue& Value);
+	void ToggleMap(const FInputActionValue& Value);
 
 	void BasicAttack(const FInputActionValue& Value);
 	void BasicAbility(const FInputActionValue& Value);
@@ -129,11 +151,15 @@ private:
 
 	void Overcharge(const FInputActionValue& Value);
 
+	void UseMana(int ManaToUse);
+
 	void LevelUp();
 
 	// Ability Declarations
 
 	void ElectricChainStart(AActor* HitActor);
 	void ElectricChainRecursive(AActor* HitActor, TArray<AActor*>& HitActors);
+
+	void SpawnProjectile(TSubclassOf<AProjectile> ProjectileToSpawn);
 
 };

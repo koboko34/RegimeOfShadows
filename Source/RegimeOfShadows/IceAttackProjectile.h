@@ -1,0 +1,32 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
+#pragma once
+
+#include "CoreMinimal.h"
+#include "Projectile.h"
+#include "IceAttackProjectile.generated.h"
+
+class APlayerCharacter;
+
+/**
+ * 
+ */
+UCLASS()
+class REGIMEOFSHADOWS_API AIceAttackProjectile : public AProjectile
+{
+	GENERATED_BODY()
+
+	AIceAttackProjectile();
+	
+protected:
+	virtual void BeginPlay() override;
+
+private:
+	UFUNCTION()
+	void OnCollision(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& Hit);
+
+	UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = true))
+	int ManaPerTarget = 3;
+
+	APlayerCharacter* Player;
+};

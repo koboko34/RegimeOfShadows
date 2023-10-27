@@ -22,7 +22,7 @@ void AFireAttackProjectile::OnCollision(UPrimitiveComponent* OverlappedComponent
 		if (!Enemy)
 			continue;
 
-		Enemy->StartDOT();
+		Enemy->ApplyBurning();
 	}
 
 	Destroy();
