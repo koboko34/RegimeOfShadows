@@ -45,8 +45,5 @@ float ABaseEntity::TakeDamage(float DamageAmount, FDamageEvent const& DamageEven
 	{
 		Health -= DamageAmount;
 	}
-
-	UE_LOG(LogTemp, Warning, TEXT("BaseEntity Health: %i\n"), Health);
-
 	return DamageAmount;
 }

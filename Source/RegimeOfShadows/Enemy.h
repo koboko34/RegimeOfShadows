@@ -9,6 +9,14 @@
 /**
  * 
  */
+
+struct StatusEffects {
+	bool Burning = false;
+	bool Wet = false;
+	bool Frost = false;
+	bool Charged = false;
+};
+
 UCLASS()
 class REGIMEOFSHADOWS_API AEnemy : public ABaseEntity
 {
@@ -19,14 +27,58 @@ public:
 
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 
+public:
+	StatusEffects StatusEffects;
+
+	void ApplyBurning(float Duration);
+	void ApplyWet(float Duration);
+	void ApplyFrost(float Duration);
+	void ApplyCharged(float Duration);
+	void ClearStatusEffects();
+
+	void StartDOT();
+
 private:
 	UPROPERTY(VisibleAnywhere, Category = Stats, meta = (AllowPrivateAccess = true))
 	int ExpOnKill;
+
+	UPROPERTY(VisibleAnywhere, Category = Stats, meta = (AllowPrivateAccess = true))
+	int DamageOnDOT = 1;
+	UPROPERTY(VisibleAnywhere, Category = Stats, meta = (AllowPrivateAccess = true))
+	int DOTDuration = 5;
+	int DOTRemainingDuration;
+	UPROPERTY(VisibleAnywhere, Category = Stats, meta = (AllowPrivateAccess = true))
+	int DOTInterval = 1;
+
+	FTimerHandle ClearBurningHandle;
+	FTimerHandle ClearWetHandle;
+	FTimerHandle ClearFrostHandle;
+	FTimerHandle ClearChargedHandle;
+
+	FTimerDelegate ClearBurningDelegate;
+	FTimerDelegate ClearWetDelegate;
+	FTimerDelegate ClearFrostDelegate;
+	FTimerDelegate ClearChargedDelegate;
+
+	FTimerHandle ApplyDOTHandle;
+	FTimerDelegate ApplyDOTDelegate;
 
 protected:
 	void GiveKillExp();
 
 private:
 	void CalculateKillExp();
+
+	UFUNCTION()
+	void ClearBurning();
+	UFUNCTION()
+	void ClearWet();
+	UFUNCTION()
+	void ClearFrost();
+	UFUNCTION()
+	void ClearCharged();
+
+	UFUNCTION()
+	void ApplyDOT();
 	
 };

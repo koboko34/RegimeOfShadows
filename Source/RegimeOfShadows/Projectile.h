@@ -28,6 +28,8 @@ public:
 protected:
 	UPROPERTY(EditDefaultsOnly)
 	int DamageToDeal = 10;
+	UPROPERTY(EditDefaultsOnly)
+	float ExplosionRadius = 100.f;
 
 protected:
 	// Called when the game starts or when spawned

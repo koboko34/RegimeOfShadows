@@ -8,6 +8,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Enemy.h"
 
 APlayerCharacter::APlayerCharacter()
 {
@@ -215,8 +216,7 @@ void APlayerCharacter::BasicAbilityElectric()
 
 	if (OutHit.bBlockingHit)
 	{
-		DrawDebugSphere(GetWorld(), OutHit.ImpactPoint, 20, 12, FColor::Purple, false, 5.f);
-		UGameplayStatics::ApplyDamage(OutHit.GetActor(), 10, GetController(), this, UDamageType::StaticClass());
+		ElectricChainStart(OutHit.GetActor());
 	}
 }
 
@@ -252,4 +252,58 @@ void APlayerCharacter::LevelUp()
 	ExpToNextLevel *= 2;
 	if (Experience > ExpToNextLevel)
 		LevelUp();
+}
+
+void APlayerCharacter::ElectricChainStart(AActor* HitActor)
+{
+	TArray<AActor*> HitActors;
+	
+	ElectricChainRecursive(HitActor, HitActors);
+}
+
+void APlayerCharacter::ElectricChainRecursive(AActor* HitActor, TArray<AActor*>& HitActors)
+{
+	HitActors.Add(HitActor);
+
+	// apply effects to this HitEnemy
+	UGameplayStatics::ApplyDamage(HitActor, ElectricChainDamage, GetController(), this, UDamageType::StaticClass());
+
+	TArray<FHitResult> HitResults;
+	FCollisionObjectQueryParams Params;
+	Params.AddObjectTypesToQuery(ECollisionChannel::ECC_Pawn);
+	FCollisionQueryParams QueryParams;
+	QueryParams.AddIgnoredActor(HitActor);
+	QueryParams.AddIgnoredActor(this);
+	GetWorld()->SweepMultiByObjectType(
+		HitResults,
+		HitActor->GetActorLocation(),
+		HitActor->GetActorLocation(),
+		FQuat::Identity,
+		Params,
+		FCollisionShape::MakeSphere(ElectricChainSpreadRadius),
+		QueryParams);
+	DrawDebugSphere(GetWorld(), HitActor->GetActorLocation(), ElectricChainSpreadRadius, 16, FColor::Purple, false, 5.f);
+
+	int Count = 0;
+	AEnemy* Enemy;
+	for (const FHitResult& HitResult : HitResults)
+	{
+		if (HitActors.Contains(HitResult.GetActor()))
+			continue;
+
+		Enemy = Cast<AEnemy>(HitResult.GetActor());
+		if (!Enemy)
+			continue;
+
+		if (!Enemy->StatusEffects.Wet)
+			continue;
+
+		ElectricChainRecursive(HitResult.GetActor(), HitActors);
+		Enemy->ClearStatusEffects();
+
+		Count++;
+
+		if (Count > 1)
+			return;
+	}
 }

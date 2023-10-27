@@ -9,6 +9,10 @@
 #include "PlayerCharacter.generated.h"
 
 class AProjectile;
+class UCameraComponent;
+class UInputMappingContext;
+class UInputAction;
+class AEnemy;
 
 UENUM(BlueprintType)
 enum class Element
@@ -27,36 +31,36 @@ public:
 	APlayerCharacter();
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-	class UCameraComponent* Camera;
+	UCameraComponent* Camera;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	class UInputMappingContext* DefaultMappingContext;
+	UInputMappingContext* DefaultMappingContext;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	class UInputAction* JumpAction;
+	UInputAction* JumpAction;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	class UInputAction* MoveAction;
+	UInputAction* MoveAction;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	class UInputAction* LookAction;
+	UInputAction* LookAction;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	class UInputAction* SprintAction;
+	UInputAction* SprintAction;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	class UInputAction* InteractAction;
+	UInputAction* InteractAction;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	class UInputAction* DodgeAction;
+	UInputAction* DodgeAction;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	class UInputAction* OverchargeAction;
+	UInputAction* OverchargeAction;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	class UInputAction* BasicAttackAction;
+	UInputAction* BasicAttackAction;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	class UInputAction* BasicAbilityAction;
+	UInputAction* BasicAbilityAction;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	class UInputAction* StrongAbilityAction;
+	UInputAction* StrongAbilityAction;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	class UInputAction* SwapToFireAction;
+	UInputAction* SwapToFireAction;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	class UInputAction* SwapToIceAction;
+	UInputAction* SwapToIceAction;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	class UInputAction* SwapToElectricAction;
+	UInputAction* SwapToElectricAction;
 
 private:
 	UPROPERTY(VisibleAnywhere, Category = Stats, meta = (AllowPrivateAccess = true))
@@ -71,8 +75,15 @@ private:
 
 	Element ActiveElement;
 
-	UPROPERTY(EditDefaultsOnly, Category = Abilities)
+	UPROPERTY(EditDefaultsOnly, Category = FireAbilities, meta = (AllowPrivateAccess))
 	TSubclassOf<AProjectile> BasicAttackFireProj;
+
+	UPROPERTY(EditDefaultsOnly, Category = ElectricAbilities, meta = (AllowPrivateAccess))
+	TSubclassOf<AActor> EnemyClass;
+	UPROPERTY(EditDefaultsOnly, Category = ElectricAbilities, meta = (AllowPrivateAccess))
+	int ElectricChainDamage = 10;
+	UPROPERTY(EditDefaultsOnly, Category = ElectricAbilities, meta = (AllowPrivateAccess))
+	float ElectricChainSpreadRadius = 300;
 
 public:
 	UCameraComponent* GetCameraComponent() const { return Camera; }
@@ -116,5 +127,10 @@ private:
 	void Overcharge(const FInputActionValue& Value);
 
 	void LevelUp();
+
+	// Ability Declarations
+
+	void ElectricChainStart(AActor* HitActor);
+	void ElectricChainRecursive(AActor* HitActor, TArray<AActor*>& HitActors);
 
 };
