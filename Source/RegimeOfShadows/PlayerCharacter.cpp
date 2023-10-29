@@ -323,23 +323,30 @@ void APlayerCharacter::ElectricChainStart(AActor* HitActor)
 }
 
 void APlayerCharacter::ElectricChainRecursive(AActor* HitActor, TArray<AActor*>& HitActors)
-{
+{	
 	HitActors.Add(HitActor);
 
 	// apply effects to this HitActor
 	AEnemy* Enemy = Cast<AEnemy>(HitActor);
-	if (Enemy)
+	if (!Enemy)
+		return;
+
+	if (Enemy->StatusEffects.Burning)
 	{
-		if (Enemy->StatusEffects.Burning)
-		{
-			UGameplayStatics::ApplyDamage(HitActor, ElectricChainDamage * ElectricChainOverchargeMultiplier, GetController(), this, UDamageType::StaticClass());
-			Enemy->ClearStatusEffects();
-			return;
-		}
+		UGameplayStatics::ApplyDamage(HitActor, ElectricChainDamage * ElectricChainOverloadedMultiplier, GetController(), this, UDamageType::StaticClass());
 		Enemy->ClearStatusEffects();
+		return;
 	}
+	
 	UGameplayStatics::ApplyDamage(HitActor, ElectricChainDamage, GetController(), this, UDamageType::StaticClass());
 
+	if (!Enemy->StatusEffects.Wet)
+	{
+		Enemy->ApplyCharged();
+		return;
+	}
+
+	Enemy->ClearStatusEffects();
 
 	TArray<FHitResult> HitResults;
 	FCollisionObjectQueryParams Params;

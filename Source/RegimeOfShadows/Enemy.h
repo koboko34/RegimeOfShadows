@@ -39,6 +39,17 @@ public:
 	void ApplyCharged();
 	void ClearStatusEffects();
 
+	UFUNCTION(BlueprintImplementableEvent)
+	void ApplyBurningMaterial();
+	UFUNCTION(BlueprintImplementableEvent)
+	void ApplyWetMaterial();
+	UFUNCTION(BlueprintImplementableEvent)
+	void ApplyFrostMaterial();
+	UFUNCTION(BlueprintImplementableEvent)
+	void ApplyChargedMaterial();
+	UFUNCTION(BlueprintImplementableEvent)
+	void RemoveStatusMaterial();
+
 private:
 	UPROPERTY(VisibleAnywhere, Category = Stats, meta = (AllowPrivateAccess = true))
 	int ExpOnKill;
@@ -67,6 +78,15 @@ private:
 
 	FTimerHandle ApplyDOTHandle;
 	FTimerDelegate ApplyDOTDelegate;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Effects, meta = (AllowPrivateAccess = true))
+	UMaterialInterface* BurningMaterial;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Effects, meta = (AllowPrivateAccess = true))
+	UMaterialInterface* WetMaterial;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Effects, meta = (AllowPrivateAccess = true))
+	UMaterialInterface* FrostMaterial;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Effects, meta = (AllowPrivateAccess = true))
+	UMaterialInterface* ChargedMaterial;
 
 protected:
 	void GiveKillExp();

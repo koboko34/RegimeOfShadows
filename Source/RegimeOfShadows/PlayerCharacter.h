@@ -102,7 +102,7 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = ElectricAbilities, meta = (AllowPrivateAccess))
 	float ElectricChainSpreadRadius = 300;
 	UPROPERTY(EditDefaultsOnly, Category = ElectricAbilities, meta = (AllowPrivateAccess))
-	float ElectricChainOverchargeMultiplier = 3.f;
+	float ElectricChainOverloadedMultiplier = 3.f;
 	UPROPERTY(EditDefaultsOnly, Category = ElectricAbilities, meta = (AllowPrivateAccess))
 	int ElectricBasicManaCost = 5;
 	UPROPERTY(EditDefaultsOnly, Category = ElectricAbilities, meta = (AllowPrivateAccess))

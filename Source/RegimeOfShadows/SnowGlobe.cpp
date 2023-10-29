@@ -77,7 +77,13 @@ void ASnowGlobe::HandleTick()
 		Enemy = Cast<AEnemy>(HitResult.GetActor());
 		if (Enemy)
 		{
-			UGameplayStatics::ApplyDamage(HitResult.GetActor(), Enemy->StatusEffects.Burning ? DamagePerTick * IceburnMultiplier : DamagePerTick, PlayerController, PlayerCharacter, UDamageType::StaticClass());
+			if (Enemy->StatusEffects.Burning)
+			{
+				UGameplayStatics::ApplyDamage(HitResult.GetActor(), DamagePerTick * IceburnMultiplier, PlayerController, PlayerCharacter, UDamageType::StaticClass());
+				Enemy->ClearStatusEffects();
+				return;
+			}
+			UGameplayStatics::ApplyDamage(HitResult.GetActor(), DamagePerTick, PlayerController, PlayerCharacter, UDamageType::StaticClass());
 			Enemy->ApplyFrost();
 		}
 	}
