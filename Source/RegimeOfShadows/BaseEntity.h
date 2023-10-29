@@ -54,6 +54,8 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = Stats, meta = (AllowPrivateAccess = true))
 	int Speed = 1;
 
+	bool bIsAlive = true;
+
 public:
 	int GetHealth() const { return Health; }
 	int GetMana() const { return Mana; }
@@ -66,5 +68,8 @@ public:
 	int GetIntelligence() const { return Intelligence; }
 	int GetVitality() const { return Vitality; }
 	int GetSpeed() const { return Speed; }
+
+	bool GetIsAlive() const { return bIsAlive; }
+	float CalcRageFactor() const;
 
 };
