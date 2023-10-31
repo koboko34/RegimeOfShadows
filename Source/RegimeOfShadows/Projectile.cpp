@@ -30,7 +30,7 @@ void AProjectile::BeginPlay()
 	
 }
 
-void AProjectile::HandleExplosion(TArray<FHitResult>& HitResultsOut, bool bDrawDebug, FColor Colour)
+void AProjectile::HandleExplosion(TArray<FHitResult>& HitResultsOut, bool bDrawDebug, FColor Colour, float DamageMultiplier)
 {
 	ACharacter* PlayerCharacter = UGameplayStatics::GetPlayerCharacter(this, 0);
 	AController* PlayerController = UGameplayStatics::GetPlayerController(this, 0);
@@ -63,7 +63,7 @@ void AProjectile::HandleExplosion(TArray<FHitResult>& HitResultsOut, bool bDrawD
 
 		UGameplayStatics::ApplyDamage(
 			Enemy,
-			DamageToDeal,
+			DamageToDeal * DamageMultiplier,
 			PlayerController,
 			PlayerCharacter,
 			UDamageType::StaticClass());

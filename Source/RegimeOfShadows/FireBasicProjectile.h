@@ -26,11 +26,23 @@ public:
 
 private:
 	TArray<AActor*> HitActors;
-
 	APlayerCharacter* PlayerCharacter;
+
+	FTimerHandle GrowthHandle;
+	FTimerDelegate GrowthDelegate;
+
+	UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = true))
+	float GrowDuration = 2.f;
+	float GrowthFactor = 1.f;
+	float InitialExplosionRadius;
+	UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = true))
+	float TargetScale = 2.f;
+	float InitialScale;
 
 protected:
 	virtual void BeginPlay() override;
+
+	virtual void Tick(float DeltaTime) override;
 
 public:
 	void Release();
@@ -40,4 +52,7 @@ private:
 	UFUNCTION()
 	void OnCollision(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& Hit);
 
+	UFUNCTION()
+	void GrowthFinish();
+	void Grow();
 };

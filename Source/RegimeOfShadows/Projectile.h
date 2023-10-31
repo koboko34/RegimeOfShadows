@@ -35,7 +35,7 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	void HandleExplosion(TArray<FHitResult>& HitResultsOut, bool bDrawDebug, FColor Colour);
+	void HandleExplosion(TArray<FHitResult>& HitResultsOut, bool bDrawDebug, FColor Colour, float DamageMultiplier = 1.f);
 
 private:
 	// void OnCollision(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& Hit);

@@ -15,15 +15,5 @@ void AFireAttackProjectile::OnCollision(UPrimitiveComponent* OverlappedComponent
 	TArray<FHitResult> HitResults;
 	HandleExplosion(HitResults, true, FColor::Red);
 
-	AEnemy* Enemy;
-	for (const FHitResult& HitResult : HitResults)
-	{
-		Enemy = Cast<AEnemy>(HitResult.GetActor());
-		if (!Enemy)
-			continue;
-
-		Enemy->ApplyBurning();
-	}
-
 	Destroy();
 }

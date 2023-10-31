@@ -7,14 +7,10 @@
 #include "InputActionValue.h"
 #include "PlayerCharacter.generated.h"
 
-class AProjectile;
 class UCameraComponent;
 class UInputMappingContext;
 class UInputAction;
-class AEnemy;
-class ASnowGlobe;
 class UAbilityComponent;
-class AFireBasicProjectile;
 
 UENUM(BlueprintType)
 enum class Element
@@ -78,43 +74,8 @@ private:
 	int SprintSpeed = 1000;
 
 	Element ActiveElement;
-
-	UPROPERTY(EditAnywhere, Category = Abilities, meta = (AllowPrivateAccess = true))
+	UPROPERTY(EditAnywhere, Category = Abilities)
 	UAbilityComponent* AbilityComponent;
-
-	UPROPERTY(EditDefaultsOnly, Category = FireAbilities, meta = (AllowPrivateAccess))
-	TSubclassOf<AProjectile> FireAttackProj;
-	UPROPERTY(EditDefaultsOnly, Category = FireAbilities, meta = (AllowPrivateAccess))
-	TSubclassOf<AProjectile> FireQProj;
-	AFireBasicProjectile* ActiveFireQProj = nullptr;
-	UPROPERTY(EditDefaultsOnly, Category = FireAbilities, meta = (AllowPrivateAccess))
-	int FireQManaCost = 15;
-	UPROPERTY(EditDefaultsOnly, Category = FireAbilities, meta = (AllowPrivateAccess))
-	int FireEManaCost = 20;
-
-	UPROPERTY(EditDefaultsOnly, Category = WaterAbilities, meta = (AllowPrivateAccess))
-	TSubclassOf<AProjectile> IceAttackProj;
-	UPROPERTY(EditDefaultsOnly, Category = WaterAbilities, meta = (AllowPrivateAccess))
-	TSubclassOf<AProjectile> WaterAbilityProj;
-	UPROPERTY(EditDefaultsOnly, Category = WaterAbilities, meta = (AllowPrivateAccess))
-	int WaterAbilityManaCost = 2;
-	UPROPERTY(EditDefaultsOnly, Category = WaterAbilities, meta = (AllowPrivateAccess))
-	TSubclassOf<ASnowGlobe> SnowGlobeClass;
-	UPROPERTY(EditDefaultsOnly, Category = WaterAbilities, meta = (AllowPrivateAccess))
-	int SnowGlobeManaCost = 5;
-
-	UPROPERTY(EditDefaultsOnly, Category = ElectricAbilities, meta = (AllowPrivateAccess))
-	TSubclassOf<AActor> EnemyClass;
-	UPROPERTY(EditDefaultsOnly, Category = ElectricAbilities, meta = (AllowPrivateAccess))
-	int ElectricChainDamage = 10;
-	UPROPERTY(EditDefaultsOnly, Category = ElectricAbilities, meta = (AllowPrivateAccess))
-	float ElectricChainSpreadRadius = 300;
-	UPROPERTY(EditDefaultsOnly, Category = ElectricAbilities, meta = (AllowPrivateAccess))
-	float ElectricChainOverloadedMultiplier = 3.f;
-	UPROPERTY(EditDefaultsOnly, Category = ElectricAbilities, meta = (AllowPrivateAccess))
-	int ElectricBasicManaCost = 5;
-	UPROPERTY(EditDefaultsOnly, Category = ElectricAbilities, meta = (AllowPrivateAccess))
-	int ElectricStrongManaCost = 15;
 
 public:
 	UCameraComponent* GetCameraComponent() const { return Camera; }
@@ -127,8 +88,11 @@ protected:
 public:
 	void AddExp(int ExpToAdd);
 	void AddMana(int ManaToAdd);
+	void UseMana(int ManaToUse);
 
 	void ResetFireQProj();
+
+	UAbilityComponent* GetAbilityComponent() const { return AbilityComponent; }
 
 private:
 	void Move(const FInputActionValue& Value);
@@ -144,34 +108,11 @@ private:
 	void BasicAbilityEnd(const FInputActionValue& Value);
 	void StrongAbility(const FInputActionValue& Value);
 
-	void BasicAttackFire();
-	void BasicAbilityFire();
-	void BasicAbilityFireEnd();
-	void StrongAbilityFire();
-
-	void BasicAttackIce();
-	void BasicAbilityIce();
-	void StrongAbilityIce();
-
-	void BasicAttackElectric();
-	void BasicAbilityElectric();
-	void StrongAbilityElectric();
-
 	void SwapToFire(const FInputActionValue& Value);
 	void SwapToIce(const FInputActionValue& Value);
 	void SwapToElectric(const FInputActionValue& Value);
 
 	void Overcharge(const FInputActionValue& Value);
 
-	void UseMana(int ManaToUse);
-
 	void LevelUp();
-
-	// Ability Declarations
-
-	void ElectricChainStart(AActor* HitActor);
-	void ElectricChainRecursive(AActor* HitActor, TArray<AActor*>& HitActors);
-
-	AProjectile* SpawnProjectile(TSubclassOf<AProjectile> ProjectileToSpawn);
-
 };
