@@ -11,6 +11,9 @@
 #include "Enemy.h"
 #include "Projectile.h"
 #include "SnowGlobe.h"
+#include "AbilityComponent.h"
+
+#include "FireBasicProjectile.h"
 
 APlayerCharacter::APlayerCharacter()
 {
@@ -24,6 +27,8 @@ APlayerCharacter::APlayerCharacter()
 	GetMesh()->SetupAttachment(Camera);
 	GetMesh()->bCastDynamicShadow = false;
 	GetMesh()->CastShadow = false;
+
+	AbilityComponent = CreateDefaultSubobject<UAbilityComponent>("AbilityComponent");
 
 	ActiveElement = Element::Fire;
 
@@ -62,6 +67,7 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 		EnhancedInputComponent->BindAction(OverchargeAction, ETriggerEvent::Started, this, &APlayerCharacter::Overcharge);
 		EnhancedInputComponent->BindAction(BasicAttackAction, ETriggerEvent::Started, this, &APlayerCharacter::BasicAttack);
 		EnhancedInputComponent->BindAction(BasicAbilityAction, ETriggerEvent::Started, this, &APlayerCharacter::BasicAbility);
+		EnhancedInputComponent->BindAction(BasicAbilityAction, ETriggerEvent::Completed, this, &APlayerCharacter::BasicAbilityEnd);
 		EnhancedInputComponent->BindAction(StrongAbilityAction, ETriggerEvent::Started, this, &APlayerCharacter::StrongAbility);
 		EnhancedInputComponent->BindAction(SwapToFireAction, ETriggerEvent::Started, this, &APlayerCharacter::SwapToFire);
 		EnhancedInputComponent->BindAction(SwapToIceAction, ETriggerEvent::Started, this, &APlayerCharacter::SwapToIce);
@@ -81,6 +87,12 @@ void APlayerCharacter::AddMana(int ManaToAdd)
 	Mana = std::min(MaxMana, Mana + ManaToAdd);
 
 	UE_LOG(LogTemp, Warning, TEXT("Mana: %i"), Mana);
+}
+
+void APlayerCharacter::ResetFireQProj()
+{
+	if (ActiveFireQProj)
+		ActiveFireQProj = nullptr;
 }
 
 void APlayerCharacter::Move(const FInputActionValue& Value)
@@ -163,6 +175,19 @@ void APlayerCharacter::BasicAbility(const FInputActionValue& Value)
 	}
 }
 
+void APlayerCharacter::BasicAbilityEnd(const FInputActionValue& Value)
+{
+	switch (ActiveElement)
+	{
+	case Element::Fire:
+		BasicAbilityFireEnd();
+		break;
+	default:
+		break;
+	}
+}
+
+
 void APlayerCharacter::StrongAbility(const FInputActionValue& Value)
 {
 	switch (ActiveElement)
@@ -183,28 +208,54 @@ void APlayerCharacter::StrongAbility(const FInputActionValue& Value)
 
 void APlayerCharacter::BasicAttackFire()
 {
-	SpawnProjectile(BasicAttackFireProj);
+	SpawnProjectile(FireAttackProj);
 }
 
 void APlayerCharacter::BasicAbilityFire()
 {
-	if (Mana < FireBasicManaCost)
+	if (ActiveFireQProj && ActiveFireQProj->bActive)
+	{
+		ActiveFireQProj->Explode();
+		return;
+	}
+	
+	if (Mana < FireQManaCost)
 		return;
 
-	UseMana(FireBasicManaCost);
+	UseMana(FireQManaCost);
+
+	FActorSpawnParameters Params;
+	Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	Params.Owner = this;
+	ActiveFireQProj = GetWorld()->SpawnActor<AFireBasicProjectile>(
+		FireQProj,
+		Camera->GetComponentLocation() + Camera->GetForwardVector() * 200,
+		Camera->GetComponentRotation(),
+		Params
+	);
+
+	ActiveFireQProj->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
+}
+
+void APlayerCharacter::BasicAbilityFireEnd()
+{
+	if (ActiveFireQProj)
+	{
+		ActiveFireQProj->Release();
+	}
 }
 
 void APlayerCharacter::StrongAbilityFire()
 {
-	if (Mana < FireStrongManaCost)
+	if (Mana < FireEManaCost)
 		return;
 
-	UseMana(FireStrongManaCost);
+	UseMana(FireEManaCost);
 }
 
 void APlayerCharacter::BasicAttackIce()
 {
-	SpawnProjectile(BasicAttackIceProj);
+	SpawnProjectile(IceAttackProj);
 }
 
 void APlayerCharacter::BasicAbilityIce()
@@ -213,7 +264,7 @@ void APlayerCharacter::BasicAbilityIce()
 		return;
 
 	UseMana(WaterAbilityManaCost);
-	SpawnProjectile(BasicAbilityWaterProj);
+	SpawnProjectile(WaterAbilityProj);
 }
 
 void APlayerCharacter::StrongAbilityIce()
@@ -387,9 +438,10 @@ void APlayerCharacter::ElectricChainRecursive(AActor* HitActor, TArray<AActor*>&
 	}
 }
 
-void APlayerCharacter::SpawnProjectile(TSubclassOf<AProjectile> ProjectileToSpawn)
+AProjectile* APlayerCharacter::SpawnProjectile(TSubclassOf<AProjectile> ProjectileToSpawn)
 {
 	FActorSpawnParameters Params;
+	Params.Owner = this;
 	Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 	AProjectile* Proj = GetWorld()->SpawnActor<AProjectile>(
 		ProjectileToSpawn,
@@ -397,6 +449,5 @@ void APlayerCharacter::SpawnProjectile(TSubclassOf<AProjectile> ProjectileToSpaw
 		Camera->GetComponentRotation(),
 		Params);
 
-	if (Proj)
-		Proj->SetOwner(this);
+	return Proj;
 }

@@ -57,18 +57,30 @@ protected:
 	bool bIsAlive = true;
 
 public:
+	UFUNCTION(BlueprintPure)
 	int GetHealth() const { return Health; }
+	UFUNCTION(BlueprintPure)
 	int GetMana() const { return Mana; }
+	UFUNCTION(BlueprintPure)
 	int GetStamina() const { return Stamina; }
+	UFUNCTION(BlueprintPure)
 	int GetMaxHealth() const { return MaxHealth; }
+	UFUNCTION(BlueprintPure)
 	int GetMaxMana() const { return MaxMana; }
+	UFUNCTION(BlueprintPure)
 	int GetMaxStamina() const { return MaxStamina; }
-	int GetLevel() const { return Level; }
+	UFUNCTION(BlueprintPure)
+	int GetEntityLevel() const { return Level; }
+	UFUNCTION(BlueprintPure)
 	int GetStrength() const { return Strength; }
+	UFUNCTION(BlueprintPure)
 	int GetIntelligence() const { return Intelligence; }
+	UFUNCTION(BlueprintPure)
 	int GetVitality() const { return Vitality; }
+	UFUNCTION(BlueprintPure)
 	int GetSpeed() const { return Speed; }
 
+	UFUNCTION(BlueprintPure)
 	bool GetIsAlive() const { return bIsAlive; }
 	float CalcRageFactor() const;
 

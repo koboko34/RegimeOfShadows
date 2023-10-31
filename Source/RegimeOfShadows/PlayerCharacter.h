@@ -13,6 +13,8 @@ class UInputMappingContext;
 class UInputAction;
 class AEnemy;
 class ASnowGlobe;
+class UAbilityComponent;
+class AFireBasicProjectile;
 
 UENUM(BlueprintType)
 enum class Element
@@ -77,17 +79,23 @@ private:
 
 	Element ActiveElement;
 
+	UPROPERTY(EditAnywhere, Category = Abilities, meta = (AllowPrivateAccess = true))
+	UAbilityComponent* AbilityComponent;
+
 	UPROPERTY(EditDefaultsOnly, Category = FireAbilities, meta = (AllowPrivateAccess))
-	TSubclassOf<AProjectile> BasicAttackFireProj;
+	TSubclassOf<AProjectile> FireAttackProj;
 	UPROPERTY(EditDefaultsOnly, Category = FireAbilities, meta = (AllowPrivateAccess))
-	int FireBasicManaCost = 15;
+	TSubclassOf<AProjectile> FireQProj;
+	AFireBasicProjectile* ActiveFireQProj = nullptr;
 	UPROPERTY(EditDefaultsOnly, Category = FireAbilities, meta = (AllowPrivateAccess))
-	int FireStrongManaCost = 20;
+	int FireQManaCost = 15;
+	UPROPERTY(EditDefaultsOnly, Category = FireAbilities, meta = (AllowPrivateAccess))
+	int FireEManaCost = 20;
 
 	UPROPERTY(EditDefaultsOnly, Category = WaterAbilities, meta = (AllowPrivateAccess))
-	TSubclassOf<AProjectile> BasicAttackIceProj;
+	TSubclassOf<AProjectile> IceAttackProj;
 	UPROPERTY(EditDefaultsOnly, Category = WaterAbilities, meta = (AllowPrivateAccess))
-	TSubclassOf<AProjectile> BasicAbilityWaterProj;
+	TSubclassOf<AProjectile> WaterAbilityProj;
 	UPROPERTY(EditDefaultsOnly, Category = WaterAbilities, meta = (AllowPrivateAccess))
 	int WaterAbilityManaCost = 2;
 	UPROPERTY(EditDefaultsOnly, Category = WaterAbilities, meta = (AllowPrivateAccess))
@@ -120,6 +128,8 @@ public:
 	void AddExp(int ExpToAdd);
 	void AddMana(int ManaToAdd);
 
+	void ResetFireQProj();
+
 private:
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
@@ -131,10 +141,12 @@ private:
 
 	void BasicAttack(const FInputActionValue& Value);
 	void BasicAbility(const FInputActionValue& Value);
+	void BasicAbilityEnd(const FInputActionValue& Value);
 	void StrongAbility(const FInputActionValue& Value);
 
 	void BasicAttackFire();
 	void BasicAbilityFire();
+	void BasicAbilityFireEnd();
 	void StrongAbilityFire();
 
 	void BasicAttackIce();
@@ -160,6 +172,6 @@ private:
 	void ElectricChainStart(AActor* HitActor);
 	void ElectricChainRecursive(AActor* HitActor, TArray<AActor*>& HitActors);
 
-	void SpawnProjectile(TSubclassOf<AProjectile> ProjectileToSpawn);
+	AProjectile* SpawnProjectile(TSubclassOf<AProjectile> ProjectileToSpawn);
 
 };

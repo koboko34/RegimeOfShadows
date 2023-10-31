@@ -6,6 +6,8 @@
 
 void AMyPlayerController::BeginPlay()
 {
+	Super::BeginPlay();
+	
 	UUserWidget* HUD = CreateWidget(this, HUDClass, TEXT("HUD"));
 	HUD->AddToViewport();
 }
