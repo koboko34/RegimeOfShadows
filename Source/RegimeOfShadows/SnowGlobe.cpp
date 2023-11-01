@@ -27,7 +27,7 @@ void ASnowGlobe::BeginPlay()
 	RemainingTime = Lifetime;
 	GetWorldTimerManager().SetTimer(TickHandle, TickDelegate, Interval, true);
 
-	DrawDebugSphere(GetWorld(), GetActorLocation(), Radius, 32, FColor::Cyan, false, Lifetime);
+	// DrawDebugSphere(GetWorld(), GetActorLocation(), Radius, 32, FColor::Cyan, false, Lifetime);
 }
 
 // Called every frame
