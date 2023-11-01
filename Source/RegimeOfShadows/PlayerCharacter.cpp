@@ -31,6 +31,8 @@ APlayerCharacter::APlayerCharacter()
 
 	Experience = 0;
 	ExpToNextLevel = pow(2, Level) * 10;
+
+	StatsTickDelegate.BindUObject(this, &APlayerCharacter::StatsTick);
 }
 
 void APlayerCharacter::BeginPlay()
@@ -44,6 +46,8 @@ void APlayerCharacter::BeginPlay()
 			Subsystem->AddMappingContext(DefaultMappingContext, 0);
 		}
 	}
+
+	GetWorldTimerManager().SetTimer(StatsTickHandle, StatsTickDelegate, 0.5f, true);
 }
 
 void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -114,6 +118,17 @@ void APlayerCharacter::Look(const FInputActionValue& Value)
 
 void APlayerCharacter::Sprint(const FInputActionValue& Value)
 {
+	if (Stamina < 10)
+	{
+		GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
+		return;
+	}
+
+	float AdjustedDrain = StaminaDrainPerSecond * GetWorld()->GetDeltaSeconds();
+	Stamina -= AdjustedDrain;
+	if (Stamina < 0)
+		Stamina = 0;
+
 	GetCharacterMovement()->MaxWalkSpeed = SprintSpeed;
 }
 
@@ -241,4 +256,9 @@ void APlayerCharacter::LevelUp()
 	ExpToNextLevel *= 2;
 	if (Experience > ExpToNextLevel)
 		LevelUp();
+}
+
+void APlayerCharacter::StatsTick()
+{
+	Stamina += 2;
 }

@@ -72,10 +72,15 @@ private:
 	int WalkSpeed = 600;
 	UPROPERTY(EditDefaultsOnly, Category = Movement, meta = (AllowPrivateAccess = true))
 	int SprintSpeed = 1000;
+	UPROPERTY(EditDefaultsOnly, Category = Movement, meta = (AllowPrivateAccess = true))
+	float StaminaDrainPerSecond = 10.f;
 
 	Element ActiveElement;
 	UPROPERTY(EditAnywhere, Category = Abilities)
 	UAbilityComponent* AbilityComponent;
+
+	FTimerHandle StatsTickHandle;
+	FTimerDelegate StatsTickDelegate;
 
 public:
 	UCameraComponent* GetCameraComponent() const { return Camera; }
@@ -115,4 +120,7 @@ private:
 	void Overcharge(const FInputActionValue& Value);
 
 	void LevelUp();
+
+	UFUNCTION()
+	void StatsTick();
 };
