@@ -31,6 +31,7 @@ void AFireBasicProjectile::BeginPlay()
 
 	PlayerCharacter = Cast<APlayerCharacter>(UGameplayStatics::GetPlayerCharacter(this, 0));
 	InitialExplosionRadius = ExplosionRadius;
+	InitialSpeed = ProjectileMovementComponent->InitialSpeed;
 	InitialScale = GetActorScale().X;
 
 	GetWorldTimerManager().SetTimer(GrowthHandle, GrowthDelegate, GrowDuration, false);
@@ -87,7 +88,8 @@ void AFireBasicProjectile::GrowthFinish()
 
 	GrowthFactor = 2.f;
 	ExplosionRadius = InitialExplosionRadius * GrowthFactor;
-	SetActorScale3D(FVector(TargetScale));
+	ProjectileMovementComponent->InitialSpeed = InitialSpeed * GrowthFactor;
+	SetActorScale3D(FVector(TargetScale, TargetScale, TargetScale));
 }
 
 void AFireBasicProjectile::Grow()
@@ -97,7 +99,7 @@ void AFireBasicProjectile::Grow()
 
 	ExplosionRadius = InitialExplosionRadius * GrowthFactor;
 	float NewScale = FMath::Lerp(InitialScale, TargetScale, Time / GrowDuration);
-	SetActorScale3D(FVector(NewScale));
+	SetActorScale3D(FVector(NewScale, NewScale, NewScale));
 }
 
 void AFireBasicProjectile::Explode()

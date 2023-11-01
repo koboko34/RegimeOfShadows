@@ -35,7 +35,8 @@ private:
 	float GrowDuration = 2.f;
 	float GrowthFactor = 1.f;
 	float InitialExplosionRadius;
-	UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = true))
+	float InitialSpeed;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
 	float TargetScale = 2.f;
 	float InitialScale;
 
