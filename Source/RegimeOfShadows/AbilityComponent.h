@@ -10,6 +10,7 @@ class APlayerCharacter;
 class AProjectile;
 class ASnowGlobe;
 class AFireBasicProjectile;
+class AElectricPortal;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class REGIMEOFSHADOWS_API UAbilityComponent : public UActorComponent
@@ -54,6 +55,22 @@ public:
 	int ElectricChainDamage = 10;
 	UPROPERTY(EditDefaultsOnly, Category = ElectricAbilities)
 	float ElectricChainSpreadRadius = 300;
+	FTimerHandle PortalSpawnHandle;
+	FTimerDelegate PortalSpawnDelegate;
+	UPROPERTY(EditDefaultsOnly, Category = ElectricAbilities)
+	TSubclassOf<AElectricPortal> ElectricPortalClass;
+	UPROPERTY(EditDefaultsOnly, Category = ElectricAbilities)
+	TSubclassOf<AActor> PortalMarkerClass;
+	UPROPERTY(EditDefaultsOnly, Category = ElectricAbilities)
+	float PortalSpawnTimeout = 5.f;
+	UPROPERTY(EditDefaultsOnly, Category = ElectricAbilities)
+	float PortalSpawnTraceDistance = 1000.f;
+	UPROPERTY(EditDefaultsOnly, Category = ElectricAbilities)
+	float PortalDuration = 5.f;
+	UPROPERTY(EditDefaultsOnly, Category = ElectricAbilities)
+	float PortalSweepRadius = 200.f;
+	UPROPERTY(EditDefaultsOnly, Category = ElectricAbilities)
+	int PortalDamage = 5;
 	UPROPERTY(EditDefaultsOnly, Category = ElectricAbilities)
 	int ElectricBasicManaCost = 5;
 	UPROPERTY(EditDefaultsOnly, Category = ElectricAbilities)
@@ -61,6 +78,10 @@ public:
 
 private:
 	APlayerCharacter* PlayerCharacter;
+
+	FVector FirstPortalSpawnLocation;
+
+	AActor* PortalMarker;
 
 public:
 	void BasicAttackFire();
@@ -79,6 +100,10 @@ public:
 private:
 	void ElectricChainStart(AActor* HitActor);
 	void ElectricChainRecursive(AActor* HitActor, TArray<AActor*>& HitActors);
+
+	UFUNCTION()
+	void CancelPortalSpawn();
+	void ClearPortalMarker();
 
 	AProjectile* SpawnProjectile(TSubclassOf<AProjectile> ProjectileToSpawn);
 };

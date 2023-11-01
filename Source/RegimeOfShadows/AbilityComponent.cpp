@@ -9,11 +9,14 @@
 #include "Enemy.h"
 #include "Projectile.h"
 #include "SnowGlobe.h"
+#include "ElectricPortal.h"
 
 UAbilityComponent::UAbilityComponent()
 {
 	PrimaryComponentTick.bCanEverTick = false;
 	SetComponentTickEnabled(false);
+
+	PortalSpawnDelegate.BindUObject(this, &UAbilityComponent::CancelPortalSpawn);
 }
 
 
@@ -44,8 +47,6 @@ void UAbilityComponent::BasicAbilityFire()
 	if (PlayerCharacter->GetMana() < FireQManaCost)
 		return;
 
-	PlayerCharacter->UseMana(FireQManaCost);
-
 	FActorSpawnParameters Params;
 	Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 	Params.Owner = PlayerCharacter;
@@ -64,6 +65,7 @@ void UAbilityComponent::BasicAbilityFireEnd()
 	if (ActiveFireQProj)
 	{
 		ActiveFireQProj->Release();
+		PlayerCharacter->UseMana(FireQManaCost);
 	}
 }
 
@@ -149,7 +151,67 @@ void UAbilityComponent::StrongAbilityElectric()
 	if (PlayerCharacter->GetMana() < ElectricStrongManaCost)
 		return;
 
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	if (!GetWorld()->GetTimerManager().IsTimerActive(PortalSpawnHandle))
+	{
+		FHitResult HitResult;
+		FVector StartVector = PlayerCharacter->Camera->GetComponentLocation();
+		FVector EndVector = StartVector + PlayerCharacter->Camera->GetForwardVector() * PortalSpawnTraceDistance;
+		FCollisionQueryParams Params;
+		Params.AddIgnoredActor(PlayerCharacter);
+		GetWorld()->LineTraceSingleByChannel(HitResult, StartVector, EndVector, ECollisionChannel::ECC_WorldStatic, Params);
+
+		if (!HitResult.bBlockingHit)
+		{
+			return;
+		}
+
+		FirstPortalSpawnLocation = HitResult.ImpactPoint;
+		PortalMarker = GetWorld()->SpawnActor<AActor>(
+			PortalMarkerClass,
+			FirstPortalSpawnLocation,
+			FRotator::ZeroRotator,
+			SpawnParams
+		);
+
+		GetWorld()->GetTimerManager().SetTimer(PortalSpawnHandle, PortalSpawnDelegate, PortalSpawnTimeout, false);
+		return;
+	}
+
+	FHitResult HitResult;
+	FVector StartVector = PlayerCharacter->Camera->GetComponentLocation();
+	FVector EndVector = StartVector + PlayerCharacter->Camera->GetForwardVector() * PortalSpawnTraceDistance;
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(PlayerCharacter);
+	GetWorld()->LineTraceSingleByChannel(HitResult, StartVector, EndVector, ECollisionChannel::ECC_WorldStatic, Params);
+
+	if (!HitResult.bBlockingHit)
+	{
+		return;
+	}
+
 	PlayerCharacter->UseMana(ElectricStrongManaCost);
+	GetWorld()->GetTimerManager().ClearTimer(PortalSpawnHandle);
+	
+	FRotator FirstPortalSpawnRotation = (HitResult.ImpactPoint - FirstPortalSpawnLocation).Rotation();
+	AElectricPortal* FirstPortal = GetWorld()->SpawnActor<AElectricPortal>(
+		ElectricPortalClass,
+		FirstPortalSpawnLocation,
+		FirstPortalSpawnRotation,
+		SpawnParams
+	);
+
+	FRotator SecondPortalSpawnRotation = (FirstPortalSpawnLocation - HitResult.ImpactPoint).Rotation();
+	AElectricPortal* SecondPortal = GetWorld()->SpawnActor<AElectricPortal>(
+		ElectricPortalClass,
+		HitResult.ImpactPoint,
+		SecondPortalSpawnRotation,
+		SpawnParams
+	);
+
+	ClearPortalMarker();
+	FirstPortal->Init(SecondPortal, this);
 }
 
 void UAbilityComponent::ElectricChainStart(AActor* HitActor)
@@ -163,7 +225,6 @@ void UAbilityComponent::ElectricChainRecursive(AActor* HitActor, TArray<AActor*>
 {
 	HitActors.Add(HitActor);
 
-	// apply effects to this HitActor
 	AEnemy* Enemy = Cast<AEnemy>(HitActor);
 	if (!Enemy)
 		return;
@@ -222,6 +283,20 @@ void UAbilityComponent::ElectricChainRecursive(AActor* HitActor, TArray<AActor*>
 		if (Count > 1)
 			return;
 	}
+}
+
+void UAbilityComponent::CancelPortalSpawn()
+{
+	ClearPortalMarker();
+}
+
+void UAbilityComponent::ClearPortalMarker()
+{
+	if (!PortalMarker)
+		return;
+
+	PortalMarker->Destroy();
+	PortalMarker = nullptr;
 }
 
 AProjectile* UAbilityComponent::SpawnProjectile(TSubclassOf<AProjectile> ProjectileToSpawn)
