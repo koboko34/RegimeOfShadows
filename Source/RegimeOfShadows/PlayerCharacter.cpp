@@ -139,6 +139,23 @@ void APlayerCharacter::StopSprint(const FInputActionValue& Value)
 
 void APlayerCharacter::Dodge(const FInputActionValue& Value)
 {
+	if (!GetCharacterMovement()->IsMovingOnGround() || Stamina < DodgeCost)
+		return;
+
+	Stamina -= DodgeCost;
+	FVector LaunchVector;
+	if (GetVelocity().Length() > 0.1)
+	{
+		FVector NormalizedVelocity = GetVelocity();
+		NormalizedVelocity.Normalize();
+		LaunchVector = FVector(NormalizedVelocity.X * DodgeDist, NormalizedVelocity.Y * DodgeDist, 100);
+	}
+	else
+	{
+		LaunchVector = FVector(GetActorForwardVector().X * DodgeDist, GetActorForwardVector().Y * DodgeDist, 100);
+	}
+	
+	LaunchCharacter(LaunchVector, false, false);
 }
 
 void APlayerCharacter::Interact(const FInputActionValue& Value)

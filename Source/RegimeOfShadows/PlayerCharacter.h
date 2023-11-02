@@ -74,6 +74,10 @@ private:
 	int SprintSpeed = 1000;
 	UPROPERTY(EditDefaultsOnly, Category = Movement, meta = (AllowPrivateAccess = true))
 	float StaminaDrainPerSecond = 10.f;
+	UPROPERTY(EditDefaultsOnly, Category = Movement, meta = (AllowPrivateAccess = true))
+	float DodgeDist = 100.f;
+	UPROPERTY(EditDefaultsOnly, Category = Movement, meta = (AllowPrivateAccess = true))
+	int DodgeCost = 10;
 
 	Element ActiveElement;
 	UPROPERTY(EditAnywhere, Category = Abilities)

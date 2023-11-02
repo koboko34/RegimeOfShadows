@@ -12,6 +12,7 @@ AElectricPortal::AElectricPortal()
 	SetActorTickEnabled(false);
 
 	Mesh = CreateDefaultSubobject<UStaticMeshComponent>("Mesh");
+	SetRootComponent(Mesh);
 
 	PulseDelegate.BindUObject(this, &AElectricPortal::Pulse);
 }
