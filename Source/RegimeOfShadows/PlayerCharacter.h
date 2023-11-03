@@ -75,7 +75,7 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = Movement, meta = (AllowPrivateAccess = true))
 	float StaminaDrainPerSecond = 10.f;
 	UPROPERTY(EditDefaultsOnly, Category = Movement, meta = (AllowPrivateAccess = true))
-	float DodgeDist = 100.f;
+	float DodgeVelocity = 1800.f;
 	UPROPERTY(EditDefaultsOnly, Category = Movement, meta = (AllowPrivateAccess = true))
 	int DodgeCost = 10;
 

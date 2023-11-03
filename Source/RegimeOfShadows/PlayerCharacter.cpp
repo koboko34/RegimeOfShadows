@@ -148,13 +148,16 @@ void APlayerCharacter::Dodge(const FInputActionValue& Value)
 	{
 		FVector NormalizedVelocity = GetVelocity();
 		NormalizedVelocity.Normalize();
-		LaunchVector = FVector(NormalizedVelocity.X * DodgeDist, NormalizedVelocity.Y * DodgeDist, 100);
+		LaunchVector = FVector(NormalizedVelocity.X * DodgeVelocity, NormalizedVelocity.Y * DodgeVelocity, 100);
 	}
 	else
 	{
-		LaunchVector = FVector(GetActorForwardVector().X * DodgeDist, GetActorForwardVector().Y * DodgeDist, 100);
+		FVector NormalizedVector = GetActorForwardVector();
+		NormalizedVector.Normalize();
+		LaunchVector = FVector(NormalizedVector.X * DodgeVelocity, NormalizedVector.Y * DodgeVelocity, 100);
 	}
 	
+	GetCharacterMovement()->StopMovementImmediately();
 	LaunchCharacter(LaunchVector, false, false);
 }
 
