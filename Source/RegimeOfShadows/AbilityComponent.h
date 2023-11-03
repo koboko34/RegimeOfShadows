@@ -29,32 +29,50 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = FireAbilities)
 	TSubclassOf<AProjectile> FireAttackProj;
 	UPROPERTY(EditDefaultsOnly, Category = FireAbilities)
+	int FireAttackCooldown = 1;
+	UPROPERTY(EditDefaultsOnly, Category = FireAbilities)
 	TSubclassOf<AProjectile> FireQProj;
 	AFireBasicProjectile* ActiveFireQProj = nullptr;
 	UPROPERTY(EditDefaultsOnly, Category = FireAbilities)
 	int FireQManaCost = 15;
 	UPROPERTY(EditDefaultsOnly, Category = FireAbilities)
+	int FireQCooldown = 6;
+	UPROPERTY(EditDefaultsOnly, Category = FireAbilities)
 	int FireEManaCost = 20;
+	UPROPERTY(EditDefaultsOnly, Category = FireAbilities)
+	int FireECooldown = 6;
 
 	UPROPERTY(EditDefaultsOnly, Category = WaterAbilities)
 	TSubclassOf<AProjectile> IceAttackProj;
+	UPROPERTY(EditDefaultsOnly, Category = WaterAbilities)
+	int IceAttackCooldown = 1;
 	UPROPERTY(EditDefaultsOnly, Category = WaterAbilities)
 	TSubclassOf<AProjectile> WaterAbilityProj;
 	UPROPERTY(EditDefaultsOnly, Category = WaterAbilities)
 	int WaterAbilityManaCost = 2;
 	UPROPERTY(EditDefaultsOnly, Category = WaterAbilities)
+	int WaterAbilityCooldown = 5;
+	UPROPERTY(EditDefaultsOnly, Category = WaterAbilities)
 	TSubclassOf<ASnowGlobe> SnowGlobeClass;
 	UPROPERTY(EditDefaultsOnly, Category = WaterAbilities)
 	int SnowGlobeManaCost = 5;
+	UPROPERTY(EditDefaultsOnly, Category = WaterAbilities)
+	int SnowGlobeCooldown = 1;
 
 	UPROPERTY(EditDefaultsOnly, Category = ElectricAbilities)
 	TSubclassOf<AActor> EnemyClass;
 	UPROPERTY(EditDefaultsOnly, Category = ElectricAbilities)
 	float OverloadedMultiplier = 2.f;
 	UPROPERTY(EditDefaultsOnly, Category = ElectricAbilities)
+	int ElectricAttackCooldown = 1;
+	UPROPERTY(EditDefaultsOnly, Category = ElectricAbilities)
 	int ElectricChainDamage = 10;
 	UPROPERTY(EditDefaultsOnly, Category = ElectricAbilities)
 	float ElectricChainSpreadRadius = 300;
+	UPROPERTY(EditDefaultsOnly, Category = ElectricAbilities)
+	int ElectricBasicManaCost = 5;
+	UPROPERTY(EditDefaultsOnly, Category = ElectricAbilities)
+	int ElectricQCooldown = 5;
 	FTimerHandle PortalSpawnHandle;
 	FTimerDelegate PortalSpawnDelegate;
 	UPROPERTY(EditDefaultsOnly, Category = ElectricAbilities)
@@ -72,9 +90,9 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = ElectricAbilities)
 	int PortalDamage = 5;
 	UPROPERTY(EditDefaultsOnly, Category = ElectricAbilities)
-	int ElectricBasicManaCost = 5;
-	UPROPERTY(EditDefaultsOnly, Category = ElectricAbilities)
 	int ElectricStrongManaCost = 15;
+	UPROPERTY(EditDefaultsOnly, Category = ElectricAbilities)
+	int ElectricECooldown = 15;
 
 private:
 	APlayerCharacter* PlayerCharacter;
@@ -82,6 +100,25 @@ private:
 	FVector FirstPortalSpawnLocation;
 
 	AActor* PortalMarker;
+
+	FTimerHandle BasicAttackFireHandle;
+	FTimerDelegate BasicAttackFireDelegate;
+	FTimerHandle BasicAbilityFireHandle;
+	FTimerDelegate BasicAbilityFireDelegate;
+	FTimerHandle StrongAbilityFireHandle;
+	FTimerDelegate StrongAbilityFireDelegate;
+	FTimerHandle BasicAttackIceHandle;
+	FTimerDelegate BasicAttackIceDelegate;
+	FTimerHandle BasicAbilityIceHandle;
+	FTimerDelegate BasicAbilityIceDelegate;
+	FTimerHandle StrongAbilityIceHandle;
+	FTimerDelegate StrongAbilityIceDelegate;
+	FTimerHandle BasicAttackElectricHandle;
+	FTimerDelegate BasicAttackElectricDelegate;
+	FTimerHandle BasicAbilityElectricHandle;
+	FTimerDelegate BasicAbilityElectricDelegate;
+	FTimerHandle StrongAbilityElectricHandle;
+	FTimerDelegate StrongAbilityElectricDelegate;
 
 public:
 	void BasicAttackFire();
@@ -105,5 +142,52 @@ private:
 	void CancelPortalSpawn();
 	void ClearPortalMarker();
 
+	void TriggerCooldown(FTimerHandle& AbilityHandle, float Duration);
+
+	UFUNCTION()
+	void BasicAttackFireCooldown();
+	UFUNCTION()
+	void BasicAbilityFireCooldown();
+	UFUNCTION()
+	void StrongAbilityFireCooldown();
+
+	UFUNCTION()
+	void BasicAttackIceCooldown();
+	UFUNCTION()
+	void BasicAbilityIceCooldown();
+	UFUNCTION()
+	void StrongAbilityIceCooldown();
+
+	UFUNCTION()
+	void BasicAttackElectricCooldown();
+	UFUNCTION()
+	void BasicAbilityElectricCooldown();
+	UFUNCTION()
+	void StrongAbilityElectricCooldown();
+
+	void BindDelegates();
+
 	AProjectile* SpawnProjectile(TSubclassOf<AProjectile> ProjectileToSpawn);
+
+public:
+	UFUNCTION(BlueprintPure)
+	float GetFireAttackCooldown() const;
+	UFUNCTION(BlueprintPure)
+	float GetFireQCooldown() const;
+	UFUNCTION(BlueprintPure)
+	float GetFireECooldown() const;
+
+	UFUNCTION(BlueprintPure)
+	float GetIceAttackCooldown() const;
+	UFUNCTION(BlueprintPure)
+	float GetIceQCooldown() const;
+	UFUNCTION(BlueprintPure)
+	float GetIceECooldown() const;
+
+	UFUNCTION(BlueprintPure)
+	float GetElectricAttackCooldown() const;
+	UFUNCTION(BlueprintPure)
+	float GetElectricQCooldown() const;
+	UFUNCTION(BlueprintPure)
+	float GetElectricECooldown() const;
 };

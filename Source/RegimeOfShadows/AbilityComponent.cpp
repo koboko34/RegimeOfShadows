@@ -16,7 +16,7 @@ UAbilityComponent::UAbilityComponent()
 	PrimaryComponentTick.bCanEverTick = false;
 	SetComponentTickEnabled(false);
 
-	PortalSpawnDelegate.BindUObject(this, &UAbilityComponent::CancelPortalSpawn);
+	BindDelegates();
 }
 
 
@@ -33,6 +33,10 @@ void UAbilityComponent::BeginPlay()
 
 void UAbilityComponent::BasicAttackFire()
 {
+	if (GetWorld()->GetTimerManager().IsTimerActive(BasicAttackFireHandle))
+		return;
+
+	TriggerCooldown(BasicAttackFireHandle, FireAttackCooldown);
 	SpawnProjectile(FireAttackProj);
 }
 
@@ -44,7 +48,7 @@ void UAbilityComponent::BasicAbilityFire()
 		return;
 	}
 
-	if (PlayerCharacter->GetMana() < FireQManaCost)
+	if (PlayerCharacter->GetMana() < FireQManaCost || GetWorld()->GetTimerManager().IsTimerActive(BasicAbilityFireHandle))
 		return;
 
 	FActorSpawnParameters Params;
@@ -65,37 +69,45 @@ void UAbilityComponent::BasicAbilityFireEnd()
 	if (ActiveFireQProj)
 	{
 		ActiveFireQProj->Release();
+		TriggerCooldown(BasicAbilityFireHandle, FireQCooldown);
 		PlayerCharacter->UseMana(FireQManaCost);
 	}
 }
 
 void UAbilityComponent::StrongAbilityFire()
 {
-	if (PlayerCharacter->GetMana() < FireEManaCost)
+	if (PlayerCharacter->GetMana() < FireEManaCost || GetWorld()->GetTimerManager().IsTimerActive(StrongAbilityFireHandle))
 		return;
 
+	TriggerCooldown(StrongAbilityFireHandle, FireECooldown);
 	PlayerCharacter->UseMana(FireEManaCost);
 }
 
 void UAbilityComponent::BasicAttackIce()
 {
+	if (GetWorld()->GetTimerManager().IsTimerActive(BasicAttackIceHandle))
+		return;
+
+	TriggerCooldown(BasicAttackIceHandle, IceAttackCooldown);
 	SpawnProjectile(IceAttackProj);
 }
 
 void UAbilityComponent::BasicAbilityIce()
 {
-	if (PlayerCharacter->GetMana() < WaterAbilityManaCost)
+	if (PlayerCharacter->GetMana() < WaterAbilityManaCost || GetWorld()->GetTimerManager().IsTimerActive(BasicAbilityIceHandle))
 		return;
 
+	TriggerCooldown(BasicAbilityIceHandle, WaterAbilityCooldown);
 	PlayerCharacter->UseMana(WaterAbilityManaCost);
 	SpawnProjectile(WaterAbilityProj);
 }
 
 void UAbilityComponent::StrongAbilityIce()
 {
-	if (PlayerCharacter->GetMana() < SnowGlobeManaCost)
+	if (PlayerCharacter->GetMana() < SnowGlobeManaCost || GetWorld()->GetTimerManager().IsTimerActive(StrongAbilityIceHandle))
 		return;
 
+	TriggerCooldown(StrongAbilityIceHandle, SnowGlobeCooldown);
 	PlayerCharacter->UseMana(SnowGlobeManaCost);
 
 	FActorSpawnParameters Params;
@@ -124,13 +136,18 @@ void UAbilityComponent::StrongAbilityIce()
 
 void UAbilityComponent::BasicAttackElectric()
 {
+	if (GetWorld()->GetTimerManager().IsTimerActive(BasicAttackElectricHandle))
+		return;
+
+	TriggerCooldown(BasicAttackElectricHandle, ElectricAttackCooldown);
 }
 
 void UAbilityComponent::BasicAbilityElectric()
 {
-	if (PlayerCharacter->GetMana() < ElectricBasicManaCost)
+	if (PlayerCharacter->GetMana() < ElectricBasicManaCost || GetWorld()->GetTimerManager().IsTimerActive(BasicAbilityElectricHandle))
 		return;
 
+	TriggerCooldown(BasicAbilityElectricHandle, ElectricQCooldown);
 	PlayerCharacter->UseMana(ElectricBasicManaCost);
 
 	FHitResult OutHit;
@@ -191,6 +208,7 @@ void UAbilityComponent::StrongAbilityElectric()
 		return;
 	}
 
+	TriggerCooldown(StrongAbilityElectricHandle, ElectricECooldown);
 	PlayerCharacter->UseMana(ElectricStrongManaCost);
 	GetWorld()->GetTimerManager().ClearTimer(PortalSpawnHandle);
 	
@@ -299,6 +317,62 @@ void UAbilityComponent::ClearPortalMarker()
 	PortalMarker = nullptr;
 }
 
+void UAbilityComponent::TriggerCooldown(FTimerHandle& AbilityHandle, float Duration)
+{
+	GetWorld()->GetTimerManager().SetTimer(AbilityHandle, Duration, false);
+}
+
+void UAbilityComponent::BasicAttackFireCooldown()
+{
+}
+
+void UAbilityComponent::BasicAbilityFireCooldown()
+{
+}
+
+void UAbilityComponent::StrongAbilityFireCooldown()
+{
+}
+
+void UAbilityComponent::BasicAttackIceCooldown()
+{
+}
+
+void UAbilityComponent::BasicAbilityIceCooldown()
+{
+}
+
+void UAbilityComponent::StrongAbilityIceCooldown()
+{
+}
+
+void UAbilityComponent::BasicAttackElectricCooldown()
+{
+}
+
+void UAbilityComponent::BasicAbilityElectricCooldown()
+{
+}
+
+void UAbilityComponent::StrongAbilityElectricCooldown()
+{
+}
+
+void UAbilityComponent::BindDelegates()
+{
+	PortalSpawnDelegate.BindUObject(this, &UAbilityComponent::CancelPortalSpawn);
+	
+	BasicAttackFireDelegate.BindUObject(this, &UAbilityComponent::BasicAttackFireCooldown);
+	BasicAbilityFireDelegate.BindUObject(this, &UAbilityComponent::BasicAbilityFireCooldown);
+	StrongAbilityFireDelegate.BindUObject(this, &UAbilityComponent::StrongAbilityFireCooldown);
+	BasicAttackIceDelegate.BindUObject(this, &UAbilityComponent::BasicAttackIceCooldown);
+	BasicAbilityIceDelegate.BindUObject(this, &UAbilityComponent::BasicAbilityIceCooldown);
+	StrongAbilityIceDelegate.BindUObject(this, &UAbilityComponent::StrongAbilityIceCooldown);
+	BasicAttackElectricDelegate.BindUObject(this, &UAbilityComponent::BasicAttackElectricCooldown);
+	BasicAbilityElectricDelegate.BindUObject(this, &UAbilityComponent::BasicAbilityElectricCooldown);
+	StrongAbilityElectricDelegate.BindUObject(this, &UAbilityComponent::StrongAbilityElectricCooldown);
+}
+
 AProjectile* UAbilityComponent::SpawnProjectile(TSubclassOf<AProjectile> ProjectileToSpawn)
 {
 	FActorSpawnParameters Params;
@@ -311,4 +385,76 @@ AProjectile* UAbilityComponent::SpawnProjectile(TSubclassOf<AProjectile> Project
 		Params);
 
 	return Proj;
+}
+
+float UAbilityComponent::GetFireAttackCooldown() const
+{
+	if (GetWorld()->GetTimerManager().IsTimerActive(BasicAttackFireHandle))
+		return GetWorld()->GetTimerManager().GetTimerRemaining(BasicAttackFireHandle);
+
+	return 0.f;
+}
+
+float UAbilityComponent::GetFireQCooldown() const
+{
+	if (GetWorld()->GetTimerManager().IsTimerActive(BasicAbilityFireHandle))
+		return GetWorld()->GetTimerManager().GetTimerRemaining(BasicAbilityFireHandle);
+
+	return 0.f;
+}
+
+float UAbilityComponent::GetFireECooldown() const
+{
+	if (GetWorld()->GetTimerManager().IsTimerActive(StrongAbilityFireHandle))
+		return GetWorld()->GetTimerManager().GetTimerRemaining(StrongAbilityFireHandle);
+
+	return 0.f;
+}
+
+float UAbilityComponent::GetIceAttackCooldown() const
+{
+	if (GetWorld()->GetTimerManager().IsTimerActive(BasicAttackIceHandle))
+		return GetWorld()->GetTimerManager().GetTimerRemaining(BasicAttackIceHandle);
+
+	return 0.f;
+}
+
+float UAbilityComponent::GetIceQCooldown() const
+{
+	if (GetWorld()->GetTimerManager().IsTimerActive(BasicAbilityIceHandle))
+		return GetWorld()->GetTimerManager().GetTimerRemaining(BasicAbilityIceHandle);
+
+	return 0.f;
+}
+
+float UAbilityComponent::GetIceECooldown() const
+{
+	if (GetWorld()->GetTimerManager().IsTimerActive(StrongAbilityIceHandle))
+		return GetWorld()->GetTimerManager().GetTimerRemaining(StrongAbilityIceHandle);
+
+	return 0.f;
+}
+
+float UAbilityComponent::GetElectricAttackCooldown() const
+{
+	if (GetWorld()->GetTimerManager().IsTimerActive(BasicAttackElectricHandle))
+		return GetWorld()->GetTimerManager().GetTimerRemaining(BasicAttackElectricHandle);
+
+	return 0.f;
+}
+
+float UAbilityComponent::GetElectricQCooldown() const
+{
+	if (GetWorld()->GetTimerManager().IsTimerActive(BasicAbilityElectricHandle))
+		return GetWorld()->GetTimerManager().GetTimerRemaining(BasicAbilityElectricHandle);
+
+	return 0.f;
+}
+
+float UAbilityComponent::GetElectricECooldown() const
+{
+	if (GetWorld()->GetTimerManager().IsTimerActive(StrongAbilityElectricHandle))
+		return GetWorld()->GetTimerManager().GetTimerRemaining(StrongAbilityElectricHandle);
+
+	return 0.f;
 }

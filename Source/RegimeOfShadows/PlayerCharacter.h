@@ -101,6 +101,7 @@ public:
 
 	void ResetFireQProj();
 
+	UFUNCTION(BlueprintPure)
 	UAbilityComponent* GetAbilityComponent() const { return AbilityComponent; }
 
 private:
