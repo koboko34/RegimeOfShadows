@@ -79,6 +79,9 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = Movement, meta = (AllowPrivateAccess = true))
 	int DodgeCost = 10;
 
+	UPROPERTY(EditDefaultsOnly, Category = Other, meta = (AllowPrivateAccess = true))
+	float InteractDistance = 800.f;
+
 	Element ActiveElement;
 	UPROPERTY(EditAnywhere, Category = Abilities)
 	UAbilityComponent* AbilityComponent;
