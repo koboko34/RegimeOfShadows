@@ -265,19 +265,31 @@ void APlayerCharacter::StrongAbility(const FInputActionValue& Value)
 
 void APlayerCharacter::SwapToFire(const FInputActionValue& Value)
 {
+	if (GetWorldTimerManager().IsTimerActive(SwapElementHandle) || ActiveElement == Element::Fire)
+		return;
+
 	ActiveElement = Element::Fire;
+	GetWorldTimerManager().SetTimer(SwapElementHandle, SwapElementCooldown, false);
 	UE_LOG(LogTemp, Warning, TEXT("Swapping to Fire\n"));
 }
 
 void APlayerCharacter::SwapToIce(const FInputActionValue& Value)
 {
+	if (GetWorldTimerManager().IsTimerActive(SwapElementHandle) || ActiveElement == Element::Ice)
+		return;
+	
 	ActiveElement = Element::Ice;
+	GetWorldTimerManager().SetTimer(SwapElementHandle, SwapElementCooldown, false);
 	UE_LOG(LogTemp, Warning, TEXT("Swapping to Ice\n"));
 }
 
 void APlayerCharacter::SwapToElectric(const FInputActionValue& Value)
 {
+	if (GetWorldTimerManager().IsTimerActive(SwapElementHandle) || ActiveElement == Element::Electric)
+		return;
+	
 	ActiveElement = Element::Electric;
+	GetWorldTimerManager().SetTimer(SwapElementHandle, SwapElementCooldown, false);
 	UE_LOG(LogTemp, Warning, TEXT("Swapping to Electric\n"));
 }
 

@@ -81,6 +81,9 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category = Other, meta = (AllowPrivateAccess = true))
 	float InteractDistance = 800.f;
+	UPROPERTY(EditDefaultsOnly, Category = Other, meta = (AllowPrivateAccess = true))
+	float SwapElementCooldown = 1.f;
+	FTimerHandle SwapElementHandle;
 
 	Element ActiveElement;
 	UPROPERTY(EditAnywhere, Category = Abilities)
