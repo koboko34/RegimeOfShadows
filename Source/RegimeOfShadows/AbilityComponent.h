@@ -29,7 +29,7 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = FireAbilities)
 	TSubclassOf<AProjectile> FireAttackProj;
 	UPROPERTY(EditDefaultsOnly, Category = FireAbilities)
-	int FireAttackCooldown = 1;
+	float FireAttackCooldown = 1.f;
 	UPROPERTY(EditDefaultsOnly, Category = FireAbilities)
 	TSubclassOf<AProjectile> FireQProj;
 	AFireBasicProjectile* ActiveFireQProj = nullptr;
@@ -45,7 +45,7 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = WaterAbilities)
 	TSubclassOf<AProjectile> IceAttackProj;
 	UPROPERTY(EditDefaultsOnly, Category = WaterAbilities)
-	int IceAttackCooldown = 1;
+	float IceAttackCooldown = 0.5f;
 	UPROPERTY(EditDefaultsOnly, Category = WaterAbilities)
 	TSubclassOf<AProjectile> WaterAbilityProj;
 	UPROPERTY(EditDefaultsOnly, Category = WaterAbilities)
@@ -64,7 +64,7 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = ElectricAbilities)
 	float OverloadedMultiplier = 2.f;
 	UPROPERTY(EditDefaultsOnly, Category = ElectricAbilities)
-	int ElectricAttackCooldown = 1;
+	float ElectricAttackCooldown = 0.5f;
 	UPROPERTY(EditDefaultsOnly, Category = ElectricAbilities)
 	int ElectricChainDamage = 10;
 	UPROPERTY(EditDefaultsOnly, Category = ElectricAbilities)
