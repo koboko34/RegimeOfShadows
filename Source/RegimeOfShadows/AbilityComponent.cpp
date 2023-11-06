@@ -16,19 +16,21 @@ UAbilityComponent::UAbilityComponent()
 	PrimaryComponentTick.bCanEverTick = false;
 	SetComponentTickEnabled(false);
 
-	BindDelegates();
-}
-
-
-void UAbilityComponent::BeginPlay()
-{
-	Super::BeginPlay();
-
 	PlayerCharacter = Cast<APlayerCharacter>(GetOwner());
 	if (!PlayerCharacter)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Failed to set PlayerCharacter in AbilityComponent!"));
+		return;
 	}
+
+	SpellSpeed = &PlayerCharacter->SpellSpeed;
+
+	PortalSpawnDelegate.BindUObject(this, &UAbilityComponent::CancelPortalSpawn);
+}
+
+void UAbilityComponent::BeginPlay()
+{
+	Super::BeginPlay();
 }
 
 void UAbilityComponent::BasicAttackFire()
@@ -319,58 +321,7 @@ void UAbilityComponent::ClearPortalMarker()
 
 void UAbilityComponent::TriggerCooldown(FTimerHandle& AbilityHandle, float Duration)
 {
-	GetWorld()->GetTimerManager().SetTimer(AbilityHandle, Duration, false);
-}
-
-void UAbilityComponent::BasicAttackFireCooldown()
-{
-}
-
-void UAbilityComponent::BasicAbilityFireCooldown()
-{
-}
-
-void UAbilityComponent::StrongAbilityFireCooldown()
-{
-}
-
-void UAbilityComponent::BasicAttackIceCooldown()
-{
-}
-
-void UAbilityComponent::BasicAbilityIceCooldown()
-{
-}
-
-void UAbilityComponent::StrongAbilityIceCooldown()
-{
-}
-
-void UAbilityComponent::BasicAttackElectricCooldown()
-{
-}
-
-void UAbilityComponent::BasicAbilityElectricCooldown()
-{
-}
-
-void UAbilityComponent::StrongAbilityElectricCooldown()
-{
-}
-
-void UAbilityComponent::BindDelegates()
-{
-	PortalSpawnDelegate.BindUObject(this, &UAbilityComponent::CancelPortalSpawn);
-	
-	BasicAttackFireDelegate.BindUObject(this, &UAbilityComponent::BasicAttackFireCooldown);
-	BasicAbilityFireDelegate.BindUObject(this, &UAbilityComponent::BasicAbilityFireCooldown);
-	StrongAbilityFireDelegate.BindUObject(this, &UAbilityComponent::StrongAbilityFireCooldown);
-	BasicAttackIceDelegate.BindUObject(this, &UAbilityComponent::BasicAttackIceCooldown);
-	BasicAbilityIceDelegate.BindUObject(this, &UAbilityComponent::BasicAbilityIceCooldown);
-	StrongAbilityIceDelegate.BindUObject(this, &UAbilityComponent::StrongAbilityIceCooldown);
-	BasicAttackElectricDelegate.BindUObject(this, &UAbilityComponent::BasicAttackElectricCooldown);
-	BasicAbilityElectricDelegate.BindUObject(this, &UAbilityComponent::BasicAbilityElectricCooldown);
-	StrongAbilityElectricDelegate.BindUObject(this, &UAbilityComponent::StrongAbilityElectricCooldown);
+	GetWorld()->GetTimerManager().SetTimer(AbilityHandle, Duration / PlayerCharacter->GetCooldownFactor(), false);
 }
 
 AProjectile* UAbilityComponent::SpawnProjectile(TSubclassOf<AProjectile> ProjectileToSpawn)

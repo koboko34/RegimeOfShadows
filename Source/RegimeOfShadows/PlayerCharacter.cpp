@@ -10,6 +10,7 @@
 #include "InteractInterface.h"
 #include "AbilityComponent.h"
 #include "FireBasicProjectile.h"
+#include "Kismet/GameplayStatics.h"
 
 APlayerCharacter::APlayerCharacter()
 {
@@ -28,12 +29,16 @@ APlayerCharacter::APlayerCharacter()
 
 	ActiveElement = Element::Fire;
 
-	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
+	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed * MoveSpeedMultiplier;
+	SpellSpeed = DefaultSpellSpeed;
+	CooldownFactor = DefaultCooldownFactor;
 
 	Experience = 0;
 	ExpToNextLevel = pow(2, Level) * 10;
 
 	StatsTickDelegate.BindUObject(this, &APlayerCharacter::StatsTick);
+	OverchargeDelegate.BindUObject(this, &APlayerCharacter::OverchargeEnd);
+	OverchargeDOTDelegate.BindUObject(this, &APlayerCharacter::FireOverchargeDOT);
 }
 
 void APlayerCharacter::BeginPlay()
@@ -78,6 +83,8 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 
 void APlayerCharacter::AddExp(int ExpToAdd)
 {
+	UE_LOG(LogTemp, Warning, TEXT("Adding exp..."));
+	
 	Experience += ExpToAdd;
 	if (Experience > ExpToNextLevel)
 		LevelUp();
@@ -122,7 +129,7 @@ void APlayerCharacter::Sprint(const FInputActionValue& Value)
 {
 	if (Stamina < 10)
 	{
-		GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
+		GetCharacterMovement()->MaxWalkSpeed = WalkSpeed * MoveSpeedMultiplier;
 		return;
 	}
 
@@ -131,12 +138,12 @@ void APlayerCharacter::Sprint(const FInputActionValue& Value)
 	if (Stamina < 0)
 		Stamina = 0;
 
-	GetCharacterMovement()->MaxWalkSpeed = SprintSpeed;
+	GetCharacterMovement()->MaxWalkSpeed = SprintSpeed * MoveSpeedMultiplier;
 }
 
 void APlayerCharacter::StopSprint(const FInputActionValue& Value)
 {
-	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
+	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed * MoveSpeedMultiplier;
 }
 
 void APlayerCharacter::Dodge(const FInputActionValue& Value)
@@ -295,6 +302,25 @@ void APlayerCharacter::SwapToElectric(const FInputActionValue& Value)
 
 void APlayerCharacter::Overcharge(const FInputActionValue& Value)
 {
+	if (GetWorldTimerManager().IsTimerActive(OverchargeDurationHandle) || GetWorldTimerManager().IsTimerActive(OverchargeCooldownHandle))
+		return;
+	
+	switch (ActiveElement)
+	{
+	case Element::Fire:
+		FireOvercharge();
+		break;
+	case Element::Ice:
+		IceOvercharge();
+		break;
+	case Element::Electric:
+		ElectricOvercharge();
+		break;
+	default:
+		break;
+	}
+
+	GetWorldTimerManager().SetTimer(OverchargeDurationHandle, OverchargeDelegate, OverchargeDuration, false);
 }
 
 void APlayerCharacter::UseMana(int ManaToUse)
@@ -306,6 +332,7 @@ void APlayerCharacter::UseMana(int ManaToUse)
 void APlayerCharacter::LevelUp()
 {
 	Level++;
+	UE_LOG(LogTemp, Warning, TEXT("Advanced to Level %i"), Level);
 	ExpToNextLevel *= 2;
 	if (Experience > ExpToNextLevel)
 		LevelUp();
@@ -313,5 +340,65 @@ void APlayerCharacter::LevelUp()
 
 void APlayerCharacter::StatsTick()
 {
-	Stamina += 2;
+	Stamina = std::min(MaxStamina, Stamina + 2);
+	
+	if (bRecoverMana)
+	{
+		Mana = std::min(MaxMana, Mana + ManaPerTick);
+	}
+}
+
+void APlayerCharacter::FireOvercharge()
+{
+	GetWorldTimerManager().SetTimer(OverchargeDOTHandle, OverchargeDOTDelegate, 1, true);
+	RemainingTimeDOT = OverchargeDuration;
+	CooldownFactor = OverchargeCooldownFactor;
+}
+
+void APlayerCharacter::IceOvercharge()
+{
+	MoveSpeedMultiplier = SlowDownMultiplier;
+	GetCharacterMovement()->MaxWalkSpeed *= MoveSpeedMultiplier;
+	bRecoverMana = true;
+}
+
+void APlayerCharacter::ElectricOvercharge()
+{
+	int Dmg;
+	if (Health < MaxHealth * OverchargeHealthCost)
+	{
+		Dmg = Health - MaxHealth * 0.01;
+	}
+	else
+	{
+		Dmg = MaxHealth * OverchargeHealthCost;
+	}
+
+	UGameplayStatics::ApplyDamage(this, Dmg, GetController(), this, UDamageType::StaticClass());
+	MoveSpeedMultiplier = SpeedUpMultiplier;
+	GetCharacterMovement()->MaxWalkSpeed *= MoveSpeedMultiplier;
+	SpellSpeed = OverchargeSpellSpeed;
+}
+
+void APlayerCharacter::OverchargeEnd()
+{
+	GetWorldTimerManager().SetTimer(OverchargeCooldownHandle, OverchargeCooldown - OverchargeDuration, false);
+
+	bRecoverMana = false;
+	MoveSpeedMultiplier = 1.f;
+	GetCharacterMovement()->MaxWalkSpeed /= MoveSpeedMultiplier;
+	SpellSpeed = DefaultSpellSpeed;
+	CooldownFactor = DefaultCooldownFactor;
+
+	UE_LOG(LogTemp, Warning, TEXT("Overcharge finished!"));
+}
+
+void APlayerCharacter::FireOverchargeDOT()
+{
+	if (Health > MaxHealth * 0.01)
+		UGameplayStatics::ApplyDamage(this, MaxHealth * 0.01, GetController(), this, UDamageType::StaticClass());
+
+	RemainingTimeDOT -= 1;
+	if (RemainingTimeDOT <= 0)
+		GetWorldTimerManager().ClearTimer(OverchargeDOTHandle);
 }

@@ -62,6 +62,8 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* SwapToElectricAction;
 
+	float SpellSpeed = 1.f;
+
 private:
 	UPROPERTY(VisibleAnywhere, Category = Stats, meta = (AllowPrivateAccess = true))
 	int Experience;
@@ -73,6 +75,11 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = Movement, meta = (AllowPrivateAccess = true))
 	int SprintSpeed = 1000;
 	UPROPERTY(EditDefaultsOnly, Category = Movement, meta = (AllowPrivateAccess = true))
+	float SpeedUpMultiplier = 1.5f;
+	UPROPERTY(EditDefaultsOnly, Category = Movement, meta = (AllowPrivateAccess = true))
+	float SlowDownMultiplier = 0.8f;
+	float MoveSpeedMultiplier = 1.f;
+	UPROPERTY(EditDefaultsOnly, Category = Movement, meta = (AllowPrivateAccess = true))
 	float StaminaDrainPerSecond = 10.f;
 	UPROPERTY(EditDefaultsOnly, Category = Movement, meta = (AllowPrivateAccess = true))
 	float DodgeVelocity = 1800.f;
@@ -81,9 +88,34 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category = Other, meta = (AllowPrivateAccess = true))
 	float InteractDistance = 800.f;
+	float CooldownFactor = 1.f;
 	UPROPERTY(EditDefaultsOnly, Category = Other, meta = (AllowPrivateAccess = true))
 	float SwapElementCooldown = 1.f;
 	FTimerHandle SwapElementHandle;
+	UPROPERTY(EditDefaultsOnly, Category = Other, meta = (AllowPrivateAccess = true))
+	float OverchargeCooldown = 60.f;
+	UPROPERTY(EditDefaultsOnly, Category = Other, meta = (AllowPrivateAccess = true))
+	float OverchargeDuration = 30.f;
+	UPROPERTY(EditDefaultsOnly, Category = Other, meta = (AllowPrivateAccess = true))
+	float OverchargeHealthCost = 0.25f;
+	UPROPERTY(EditDefaultsOnly, Category = Other, meta = (AllowPrivateAccess = true))
+	float DefaultSpellSpeed = 1.f;
+	UPROPERTY(EditDefaultsOnly, Category = Other, meta = (AllowPrivateAccess = true))
+	float OverchargeSpellSpeed = 2.f;
+	UPROPERTY(EditDefaultsOnly, Category = Other, meta = (AllowPrivateAccess = true))
+	float DefaultCooldownFactor = 1.f;
+	UPROPERTY(EditDefaultsOnly, Category = Other, meta = (AllowPrivateAccess = true))
+	float OverchargeCooldownFactor = 2.f;
+
+	FTimerHandle OverchargeDurationHandle;
+	FTimerHandle OverchargeCooldownHandle;
+	FTimerDelegate OverchargeDelegate;
+	FTimerHandle OverchargeDOTHandle;
+	FTimerDelegate OverchargeDOTDelegate;
+	float RemainingTimeDOT;
+	UPROPERTY(EditDefaultsOnly, Category = Other, meta = (AllowPrivateAccess = true))
+	int ManaPerTick = 5;
+	bool bRecoverMana = false;
 
 	Element ActiveElement;
 	UPROPERTY(EditAnywhere, Category = Abilities)
@@ -110,6 +142,9 @@ public:
 	UFUNCTION(BlueprintPure)
 	UAbilityComponent* GetAbilityComponent() const { return AbilityComponent; }
 
+	float GetSpellSpeed() const { return SpellSpeed; }
+	float GetCooldownFactor() const { return CooldownFactor; }
+
 private:
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
@@ -134,4 +169,12 @@ private:
 
 	UFUNCTION()
 	void StatsTick();
+
+	void FireOvercharge();
+	void IceOvercharge();
+	void ElectricOvercharge();
+	UFUNCTION()
+	void OverchargeEnd();
+	UFUNCTION()
+	void FireOverchargeDOT();
 };

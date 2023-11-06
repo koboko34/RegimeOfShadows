@@ -34,7 +34,7 @@ void AFireBasicProjectile::BeginPlay()
 	InitialSpeed = ProjectileMovementComponent->InitialSpeed;
 	InitialScale = GetActorScale().X;
 
-	GetWorldTimerManager().SetTimer(GrowthHandle, GrowthDelegate, GrowDuration, false);
+	GetWorldTimerManager().SetTimer(GrowthHandle, GrowthDelegate, GrowDuration / PlayerCharacter->GetSpellSpeed(), false);
 }
 
 void AFireBasicProjectile::Tick(float DeltaTime)
@@ -98,7 +98,7 @@ void AFireBasicProjectile::Grow()
 	GrowthFactor = 1.f + (Time / GrowDuration);
 
 	ExplosionRadius = InitialExplosionRadius * GrowthFactor;
-	float NewScale = FMath::Lerp(InitialScale, TargetScale, Time / GrowDuration);
+	float NewScale = FMath::Lerp(InitialScale, TargetScale, Time / (GrowDuration / PlayerCharacter->GetSpellSpeed()));
 	SetActorScale3D(FVector(NewScale, NewScale, NewScale));
 }
 

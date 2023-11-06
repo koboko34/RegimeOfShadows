@@ -120,6 +120,8 @@ private:
 	FTimerHandle StrongAbilityElectricHandle;
 	FTimerDelegate StrongAbilityElectricDelegate;
 
+	float* SpellSpeed;
+
 public:
 	void BasicAttackFire();
 	void BasicAbilityFire();
@@ -134,6 +136,8 @@ public:
 	void BasicAbilityElectric();
 	void StrongAbilityElectric();
 
+	float GetSpellSpeed() const { return *SpellSpeed; }
+
 private:
 	void ElectricChainStart(AActor* HitActor);
 	void ElectricChainRecursive(AActor* HitActor, TArray<AActor*>& HitActors);
@@ -143,29 +147,6 @@ private:
 	void ClearPortalMarker();
 
 	void TriggerCooldown(FTimerHandle& AbilityHandle, float Duration);
-
-	UFUNCTION()
-	void BasicAttackFireCooldown();
-	UFUNCTION()
-	void BasicAbilityFireCooldown();
-	UFUNCTION()
-	void StrongAbilityFireCooldown();
-
-	UFUNCTION()
-	void BasicAttackIceCooldown();
-	UFUNCTION()
-	void BasicAbilityIceCooldown();
-	UFUNCTION()
-	void StrongAbilityIceCooldown();
-
-	UFUNCTION()
-	void BasicAttackElectricCooldown();
-	UFUNCTION()
-	void BasicAbilityElectricCooldown();
-	UFUNCTION()
-	void StrongAbilityElectricCooldown();
-
-	void BindDelegates();
 
 	AProjectile* SpawnProjectile(TSubclassOf<AProjectile> ProjectileToSpawn);
 
