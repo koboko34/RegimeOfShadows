@@ -24,13 +24,6 @@ void AElectricPortal::BeginPlay()
 	PlayerActor = Cast<AActor>(UGameplayStatics::GetPlayerCharacter(this, 0));
 }
 
-// Called every frame
-//void AElectricPortal::Tick(float DeltaTime)
-//{
-//	Super::Tick(DeltaTime);
-//
-//}
-
 void AElectricPortal::Init(AElectricPortal* Portal, UAbilityComponent* InAbilityComponent)
 {
 	PartnerPortal = Portal;

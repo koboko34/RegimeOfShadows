@@ -79,18 +79,6 @@ void AEnemy::ClearStatusEffects()
 	RemoveStatusMaterial();
 
 	GetWorldTimerManager().ClearAllTimersForObject(this);
-	/*
-	if (ClearBurningHandle.IsValid())
-		GetWorldTimerManager().ClearTimer(ClearBurningHandle);
-	if (ClearWetHandle.IsValid())
-		GetWorldTimerManager().ClearTimer(ClearWetHandle);
-	if (ClearFrostHandle.IsValid())
-		GetWorldTimerManager().ClearTimer(ClearFrostHandle);
-	if (ClearChargedHandle.IsValid())
-		GetWorldTimerManager().ClearTimer(ClearChargedHandle);
-	if (ApplyDOTHandle.IsValid())
-		GetWorldTimerManager().ClearTimer(ApplyDOTHandle);
-	*/
 }
 
 void AEnemy::GiveKillExp()

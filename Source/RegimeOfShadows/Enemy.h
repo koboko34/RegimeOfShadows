@@ -59,7 +59,7 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = Stats, meta = (AllowPrivateAccess = true))
 	int FireDamageOnDOT = 1;
 	UPROPERTY(VisibleAnywhere, Category = Stats, meta = (AllowPrivateAccess = true))
-	int ElectricDamageOnDOT = 1;
+	int ElectricDamageOnDOT = 2;
 	int DOTRemainingDuration;
 	UPROPERTY(VisibleAnywhere, Category = Stats, meta = (AllowPrivateAccess = true))
 	int FireDOTInterval = 1;
