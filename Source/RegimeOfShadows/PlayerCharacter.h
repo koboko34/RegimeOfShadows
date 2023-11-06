@@ -117,6 +117,8 @@ private:
 	int ManaPerTick = 5;
 	bool bRecoverMana = false;
 
+	int Flow = 0;
+
 	Element ActiveElement;
 	UPROPERTY(EditAnywhere, Category = Abilities)
 	UAbilityComponent* AbilityComponent;
@@ -125,6 +127,8 @@ private:
 	FTimerDelegate StatsTickDelegate;
 
 public:
+	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
+	
 	UCameraComponent* GetCameraComponent() const { return Camera; }
 
 protected:
@@ -141,6 +145,13 @@ public:
 
 	UFUNCTION(BlueprintPure)
 	UAbilityComponent* GetAbilityComponent() const { return AbilityComponent; }
+
+	UFUNCTION(BlueprintPure)
+	int GetFlow() const { return Flow; }
+	UFUNCTION(BlueprintPure)
+	bool IsOvercharged() const { return GetWorldTimerManager().IsTimerActive(OverchargeDurationHandle); }
+	UFUNCTION(BlueprintPure)
+	float GetOverchargeRemainingTime() const { return GetWorldTimerManager().GetTimerRemaining(OverchargeDurationHandle); }
 
 	float GetSpellSpeed() const { return SpellSpeed; }
 	float GetCooldownFactor() const { return CooldownFactor; }

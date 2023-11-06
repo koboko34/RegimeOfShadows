@@ -41,6 +41,16 @@ APlayerCharacter::APlayerCharacter()
 	OverchargeDOTDelegate.BindUObject(this, &APlayerCharacter::FireOverchargeDOT);
 }
 
+float APlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+
+	if (DamageCauser != this)
+		Flow /= 2;
+
+	return DamageAmount;
+}
+
 void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
@@ -168,6 +178,9 @@ void APlayerCharacter::Dodge(const FInputActionValue& Value)
 	
 	GetCharacterMovement()->StopMovementImmediately();
 	LaunchCharacter(LaunchVector, false, false);
+
+	// ==================== FOR TESTING ONLY
+	Flow++;
 }
 
 void APlayerCharacter::Interact(const FInputActionValue& Value)
