@@ -34,6 +34,20 @@ public:
 	TSubclassOf<AProjectile> FireQProj;
 	AFireBasicProjectile* ActiveFireQProj = nullptr;
 	UPROPERTY(EditDefaultsOnly, Category = FireAbilities)
+	TSubclassOf<AProjectile> MeteorClass;
+	UPROPERTY(EditDefaultsOnly, Category = FireAbilities)
+	int MeteorShowerDuration = 10;
+	UPROPERTY(EditDefaultsOnly, Category = FireAbilities)
+	float MeteorSpawnInterval = 0.5f;
+	UPROPERTY(EditDefaultsOnly, Category = FireAbilities)
+	float MeteorSpawnRadius = 100.f;
+	UPROPERTY(EditDefaultsOnly, Category = FireAbilities)
+	float MeteorShowerHeightOffset = 1000.f;
+	FTimerHandle MeteorShowerHandle;
+	FTimerDelegate MeteorShowerDelegate;
+	float MeteorShowerTimeRemaining;
+	FVector MeteorShowerImpact;
+	UPROPERTY(EditDefaultsOnly, Category = FireAbilities)
 	int FireQManaCost = 15;
 	UPROPERTY(EditDefaultsOnly, Category = FireAbilities)
 	int FireQCooldown = 6;
@@ -139,6 +153,9 @@ public:
 	float GetSpellSpeed() const { return *SpellSpeed; }
 
 private:
+	UFUNCTION()
+	void MeteorShower();
+	
 	void ElectricChainStart(AActor* HitActor);
 	void ElectricChainRecursive(AActor* HitActor, TArray<AActor*>& HitActors);
 

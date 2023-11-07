@@ -25,6 +25,7 @@ UAbilityComponent::UAbilityComponent()
 
 	SpellSpeed = &PlayerCharacter->SpellSpeed;
 
+	MeteorShowerDelegate.BindUObject(this, &UAbilityComponent::MeteorShower);
 	PortalSpawnDelegate.BindUObject(this, &UAbilityComponent::CancelPortalSpawn);
 }
 
@@ -80,6 +81,29 @@ void UAbilityComponent::StrongAbilityFire()
 {
 	if (PlayerCharacter->GetMana() < FireEManaCost || GetWorld()->GetTimerManager().IsTimerActive(StrongAbilityFireHandle))
 		return;
+
+	FHitResult OutHit;
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(PlayerCharacter);
+	FVector StartLocation = PlayerCharacter->Camera->GetComponentLocation();
+	FVector EndLocation = StartLocation + PlayerCharacter->Camera->GetForwardVector() * 20000;
+	GetWorld()->LineTraceSingleByChannel(
+		OutHit,
+		StartLocation,
+		EndLocation,
+		ECollisionChannel::ECC_Visibility, Params
+	);
+	
+	DrawDebugLine(GetWorld(), StartLocation, EndLocation, FColor::Red, false, 2.f);
+
+	if (!OutHit.bBlockingHit)
+		return;
+
+	DrawDebugSphere(GetWorld(), OutHit.ImpactPoint, MeteorSpawnRadius, 32, FColor::Red, false, 2.f);
+
+	MeteorShowerImpact = OutHit.ImpactPoint;
+	MeteorShowerTimeRemaining = MeteorShowerDuration;
+	GetWorld()->GetTimerManager().SetTimer(MeteorShowerHandle, MeteorShowerDelegate, MeteorSpawnInterval, true);
 
 	TriggerCooldown(StrongAbilityFireHandle, FireECooldown);
 	PlayerCharacter->UseMana(FireEManaCost);
@@ -232,6 +256,29 @@ void UAbilityComponent::StrongAbilityElectric()
 
 	ClearPortalMarker();
 	FirstPortal->Init(SecondPortal, this);
+}
+
+void UAbilityComponent::MeteorShower()
+{
+	FVector RandomOffset = FVector(FMath::RandRange(-MeteorSpawnRadius, MeteorSpawnRadius), FMath::RandRange(-MeteorSpawnRadius, MeteorSpawnRadius), MeteorShowerHeightOffset);
+	FVector SpawnLocation = MeteorShowerImpact + RandomOffset;
+	FActorSpawnParameters Params;
+	Params.Owner = PlayerCharacter;
+	Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	GetWorld()->SpawnActor<AProjectile>(
+		MeteorClass,
+		SpawnLocation,
+		FRotator::ZeroRotator,
+		Params
+	);
+
+	if (MeteorShowerTimeRemaining <= 0)
+	{
+		GetWorld()->GetTimerManager().ClearTimer(MeteorShowerHandle);
+		return;
+	}
+
+	MeteorShowerTimeRemaining -= MeteorSpawnInterval;
 }
 
 void UAbilityComponent::ElectricChainStart(AActor* HitActor)
