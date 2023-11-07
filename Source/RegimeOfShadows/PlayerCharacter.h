@@ -13,8 +13,9 @@ class UInputAction;
 class UAbilityComponent;
 
 UENUM(BlueprintType)
-enum class Element
+enum class Element : uint8
 {
+	None		UMETA(DisplayName = "None"),
 	Fire		UMETA(DisplayName = "Fire"),
 	Ice			UMETA(DisplayName = "Ice"),
 	Electric	UMETA(DisplayName = "Electric")
@@ -107,6 +108,7 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = Other, meta = (AllowPrivateAccess = true))
 	float OverchargeCooldownFactor = 2.f;
 
+	Element OverchargedElement;
 	FTimerHandle OverchargeDurationHandle;
 	FTimerHandle OverchargeCooldownHandle;
 	FTimerDelegate OverchargeDelegate;
@@ -151,7 +153,11 @@ public:
 	UFUNCTION(BlueprintPure)
 	bool IsOvercharged() const { return GetWorldTimerManager().IsTimerActive(OverchargeDurationHandle); }
 	UFUNCTION(BlueprintPure)
+	Element GetOverchargedElement() const { return OverchargedElement; }
+	UFUNCTION(BlueprintPure)
 	float GetOverchargeRemainingTime() const { return GetWorldTimerManager().GetTimerRemaining(OverchargeDurationHandle); }
+	UFUNCTION(BlueprintPure)
+	float GetOverchargeCooldown() const { return GetWorldTimerManager().GetTimerRemaining(OverchargeCooldownHandle); }
 
 	float GetSpellSpeed() const { return SpellSpeed; }
 	float GetCooldownFactor() const { return CooldownFactor; }

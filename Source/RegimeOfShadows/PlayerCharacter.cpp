@@ -28,6 +28,7 @@ APlayerCharacter::APlayerCharacter()
 	AbilityComponent = CreateDefaultSubobject<UAbilityComponent>("AbilityComponent");
 
 	ActiveElement = Element::Fire;
+	OverchargedElement = Element::None;
 
 	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed * MoveSpeedMultiplier;
 	SpellSpeed = DefaultSpellSpeed;
@@ -366,6 +367,7 @@ void APlayerCharacter::FireOvercharge()
 	GetWorldTimerManager().SetTimer(OverchargeDOTHandle, OverchargeDOTDelegate, 1, true);
 	RemainingTimeDOT = OverchargeDuration;
 	CooldownFactor = OverchargeCooldownFactor;
+	OverchargedElement = Element::Fire;
 }
 
 void APlayerCharacter::IceOvercharge()
@@ -373,6 +375,7 @@ void APlayerCharacter::IceOvercharge()
 	MoveSpeedMultiplier = SlowDownMultiplier;
 	GetCharacterMovement()->MaxWalkSpeed *= MoveSpeedMultiplier;
 	bRecoverMana = true;
+	OverchargedElement = Element::Ice;
 }
 
 void APlayerCharacter::ElectricOvercharge()
@@ -391,6 +394,7 @@ void APlayerCharacter::ElectricOvercharge()
 	MoveSpeedMultiplier = SpeedUpMultiplier;
 	GetCharacterMovement()->MaxWalkSpeed *= MoveSpeedMultiplier;
 	SpellSpeed = OverchargeSpellSpeed;
+	OverchargedElement = Element::Electric;
 }
 
 void APlayerCharacter::OverchargeEnd()
@@ -402,6 +406,7 @@ void APlayerCharacter::OverchargeEnd()
 	GetCharacterMovement()->MaxWalkSpeed /= MoveSpeedMultiplier;
 	SpellSpeed = DefaultSpellSpeed;
 	CooldownFactor = DefaultCooldownFactor;
+	OverchargedElement = Element::None;
 
 	UE_LOG(LogTemp, Warning, TEXT("Overcharge finished!"));
 }
