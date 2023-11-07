@@ -34,7 +34,7 @@ protected:
 	UPROPERTY(VisibleInstanceOnly, Category = Stats, meta = (AllowPrivateAccess = true))
 	int Mana = 50;
 	UPROPERTY(VisibleInstanceOnly, Category = Stats, meta = (AllowPrivateAccess = true))
-	int Stamina = 50;
+	float Stamina = 50;
 
 	UPROPERTY(EditDefaultsOnly, Category = Stats, meta = (AllowPrivateAccess = true))
 	int MaxHealth = 100;

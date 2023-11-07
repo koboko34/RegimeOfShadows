@@ -40,10 +40,21 @@ APlayerCharacter::APlayerCharacter()
 	StatsTickDelegate.BindUObject(this, &APlayerCharacter::StatsTick);
 	OverchargeDelegate.BindUObject(this, &APlayerCharacter::OverchargeEnd);
 	OverchargeDOTDelegate.BindUObject(this, &APlayerCharacter::FireOverchargeDOT);
+	DodgeDelegate.BindUObject(this, &APlayerCharacter::DodgeEnd);
 }
 
 float APlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
+	if (GetWorldTimerManager().IsTimerActive(DodgeHandle) && DamageCauser != this)
+	{
+		if (DodgedActors.Contains(DamageCauser))
+			return DamageAmount;
+		
+		Flow = std::min(MaxFlow, Flow + 1);
+		DodgedActors.Add(DamageCauser);
+		return DamageAmount;
+	}
+	
 	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 
 	if (DamageCauser != this)
@@ -141,20 +152,26 @@ void APlayerCharacter::Sprint(const FInputActionValue& Value)
 	if (Stamina < 10)
 	{
 		GetCharacterMovement()->MaxWalkSpeed = WalkSpeed * MoveSpeedMultiplier;
+		bSprinting = false;
 		return;
 	}
 
-	float AdjustedDrain = StaminaDrainPerSecond * GetWorld()->GetDeltaSeconds();
-	Stamina -= AdjustedDrain;
-	if (Stamina < 0)
-		Stamina = 0;
+	if (GetVelocity().Length() > 1)
+	{
+		float AdjustedDrain = StaminaDrainPerSecond * GetWorld()->GetDeltaSeconds();
+		Stamina -= AdjustedDrain;
+		if (Stamina < 0)
+			Stamina = 0;
+	}
 
 	GetCharacterMovement()->MaxWalkSpeed = SprintSpeed * MoveSpeedMultiplier;
+	bSprinting = true;
 }
 
 void APlayerCharacter::StopSprint(const FInputActionValue& Value)
 {
 	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed * MoveSpeedMultiplier;
+	bSprinting = false;
 }
 
 void APlayerCharacter::Dodge(const FInputActionValue& Value)
@@ -179,6 +196,7 @@ void APlayerCharacter::Dodge(const FInputActionValue& Value)
 	
 	GetCharacterMovement()->StopMovementImmediately();
 	LaunchCharacter(LaunchVector, false, false);
+	GetWorldTimerManager().SetTimer(DodgeHandle, DodgeDelegate, DodgeDuration, false);
 
 	// ==================== FOR TESTING ONLY
 	Flow++;
@@ -354,12 +372,16 @@ void APlayerCharacter::LevelUp()
 
 void APlayerCharacter::StatsTick()
 {
-	Stamina = std::min(MaxStamina, Stamina + 2);
+	if (!bSprinting)
+		Stamina = std::min(MaxStamina, (int)Stamina + 2);
 	
 	if (bRecoverMana)
-	{
 		Mana = std::min(MaxMana, Mana + ManaPerTick);
-	}
+}
+
+void APlayerCharacter::DodgeEnd()
+{
+	DodgedActors.Empty();
 }
 
 void APlayerCharacter::FireOvercharge()

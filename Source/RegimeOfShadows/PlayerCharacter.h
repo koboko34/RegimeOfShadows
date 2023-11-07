@@ -75,6 +75,7 @@ private:
 	int WalkSpeed = 600;
 	UPROPERTY(EditDefaultsOnly, Category = Movement, meta = (AllowPrivateAccess = true))
 	int SprintSpeed = 1000;
+	bool bSprinting = false;
 	UPROPERTY(EditDefaultsOnly, Category = Movement, meta = (AllowPrivateAccess = true))
 	float SpeedUpMultiplier = 1.5f;
 	UPROPERTY(EditDefaultsOnly, Category = Movement, meta = (AllowPrivateAccess = true))
@@ -86,6 +87,15 @@ private:
 	float DodgeVelocity = 1800.f;
 	UPROPERTY(EditDefaultsOnly, Category = Movement, meta = (AllowPrivateAccess = true))
 	int DodgeCost = 10;
+
+	UPROPERTY(EditDefaultsOnly, Category = Combat, meta = (AllowPrivateAccess = true))
+	float DodgeDuration = 1.f;
+	FTimerHandle DodgeHandle;
+	FTimerDelegate DodgeDelegate;
+	int Flow = 0;
+	UPROPERTY(EditDefaultsOnly, Category = Combat, meta = (AllowPrivateAccess = true))
+	int MaxFlow = 10;
+	TArray<AActor*> DodgedActors;
 
 	UPROPERTY(EditDefaultsOnly, Category = Other, meta = (AllowPrivateAccess = true))
 	float InteractDistance = 800.f;
@@ -118,8 +128,6 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = Other, meta = (AllowPrivateAccess = true))
 	int ManaPerTick = 5;
 	bool bRecoverMana = false;
-
-	int Flow = 0;
 
 	Element ActiveElement;
 	UPROPERTY(EditAnywhere, Category = Abilities)
@@ -186,6 +194,9 @@ private:
 
 	UFUNCTION()
 	void StatsTick();
+
+	UFUNCTION()
+	void DodgeEnd();
 
 	void FireOvercharge();
 	void IceOvercharge();
