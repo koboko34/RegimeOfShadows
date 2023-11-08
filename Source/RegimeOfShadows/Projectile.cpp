@@ -16,6 +16,7 @@ AProjectile::AProjectile()
 	Mesh = CreateDefaultSubobject<UStaticMeshComponent>("Mesh");
 	SetRootComponent(Mesh);
 	Mesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	Mesh->bReceivesDecals = false;
 
 	SphereCollider = CreateDefaultSubobject<USphereComponent>("SphereCollider");
 	SphereCollider->SetupAttachment(Mesh);

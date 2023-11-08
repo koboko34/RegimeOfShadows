@@ -10,6 +10,8 @@
 #include "Projectile.h"
 #include "SnowGlobe.h"
 #include "ElectricPortal.h"
+#include "Decal.h"
+#include "Components/DecalComponent.h"
 
 UAbilityComponent::UAbilityComponent()
 {
@@ -100,6 +102,12 @@ void UAbilityComponent::StrongAbilityFire()
 		return;
 
 	DrawDebugSphere(GetWorld(), OutHit.ImpactPoint, MeteorSpawnRadius, 32, FColor::Red, false, 2.f);
+	
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	MeteorDecal = GetWorld()->SpawnActor<ADecal>(MeteorDecalClass, OutHit.ImpactPoint, FRotator(90, FMath::RandRange(0, 360), 0), SpawnParams);
+	if (MeteorDecal)
+		MeteorDecal->Decal->DecalSize = FVector(DecalDepth, MeteorSpawnRadius, MeteorSpawnRadius);
 
 	MeteorShowerImpact = OutHit.ImpactPoint;
 	MeteorShowerTimeRemaining = MeteorShowerDuration;
@@ -275,6 +283,8 @@ void UAbilityComponent::MeteorShower()
 	if (MeteorShowerTimeRemaining <= 0)
 	{
 		GetWorld()->GetTimerManager().ClearTimer(MeteorShowerHandle);
+		MeteorDecal->Destroy();
+		MeteorDecal = nullptr;
 		return;
 	}
 

@@ -11,6 +11,7 @@ class AProjectile;
 class ASnowGlobe;
 class AFireBasicProjectile;
 class AElectricPortal;
+class ADecal;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class REGIMEOFSHADOWS_API UAbilityComponent : public UActorComponent
@@ -35,6 +36,11 @@ public:
 	AFireBasicProjectile* ActiveFireQProj = nullptr;
 	UPROPERTY(EditDefaultsOnly, Category = FireAbilities)
 	TSubclassOf<AProjectile> MeteorClass;
+	UPROPERTY(EditDefaultsOnly, Category = FireAbilities)
+	TSubclassOf<ADecal> MeteorDecalClass;
+	ADecal* MeteorDecal = nullptr;
+	UPROPERTY(EditDefaultsOnly, Category = FireAbilities)
+	float DecalDepth = 512.f;
 	UPROPERTY(EditDefaultsOnly, Category = FireAbilities)
 	int MeteorShowerDuration = 10;
 	UPROPERTY(EditDefaultsOnly, Category = FireAbilities)

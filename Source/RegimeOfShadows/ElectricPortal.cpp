@@ -13,6 +13,7 @@ AElectricPortal::AElectricPortal()
 
 	Mesh = CreateDefaultSubobject<UStaticMeshComponent>("Mesh");
 	SetRootComponent(Mesh);
+	Mesh->bReceivesDecals = false;
 
 	PulseDelegate.BindUObject(this, &AElectricPortal::Pulse);
 }

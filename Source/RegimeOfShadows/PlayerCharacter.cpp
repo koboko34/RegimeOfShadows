@@ -24,6 +24,7 @@ APlayerCharacter::APlayerCharacter()
 	GetMesh()->SetupAttachment(Camera);
 	GetMesh()->bCastDynamicShadow = false;
 	GetMesh()->CastShadow = false;
+	GetMesh()->bReceivesDecals = false;
 
 	AbilityComponent = CreateDefaultSubobject<UAbilityComponent>("AbilityComponent");
 
