@@ -173,6 +173,36 @@ void UAbilityComponent::BasicAttackElectric()
 	if (GetWorld()->GetTimerManager().IsTimerActive(BasicAttackElectricHandle))
 		return;
 
+	TArray<FHitResult> HitResults;
+	FVector AttackLocation = PlayerCharacter->Camera->GetComponentLocation() + PlayerCharacter->Camera->GetForwardVector() * ElectricAttackDistance;
+	FCollisionObjectQueryParams ObjectQueryParams;
+	ObjectQueryParams.AddObjectTypesToQuery(ECollisionChannel::ECC_Pawn);
+	FCollisionQueryParams CollisionQueryParams;
+	CollisionQueryParams.AddIgnoredActor(PlayerCharacter);
+	FQuat Quat = (PlayerCharacter->Camera->GetForwardVector().Rotation() + FRotator(0, 0, 90)).Quaternion();
+	GetWorld()->SweepMultiByObjectType(
+		HitResults,
+		AttackLocation,
+		AttackLocation,
+		Quat,
+		ObjectQueryParams,
+		FCollisionShape::MakeCapsule(ElectricAttackRadius, ElectricAttackHalfHeight),
+		CollisionQueryParams
+	);
+
+	DrawDebugCapsule(GetWorld(), AttackLocation, ElectricAttackHalfHeight, ElectricAttackRadius, Quat, FColor::Purple, false, 2.f);
+
+	for (const FHitResult& HitResult : HitResults)
+	{
+		UGameplayStatics::ApplyDamage(
+			HitResult.GetActor(),
+			ElectricAttackDamage,
+			PlayerCharacter->GetController(),
+			PlayerCharacter,
+			UDamageType::StaticClass()
+		);
+	}
+
 	TriggerCooldown(BasicAttackElectricHandle, ElectricAttackCooldown);
 }
 

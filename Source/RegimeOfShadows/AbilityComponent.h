@@ -84,6 +84,14 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = ElectricAbilities)
 	float OverloadedMultiplier = 2.f;
 	UPROPERTY(EditDefaultsOnly, Category = ElectricAbilities)
+	int ElectricAttackDamage = 5;
+	UPROPERTY(EditDefaultsOnly, Category = ElectricAbilities)
+	float ElectricAttackRadius = 100.f;
+	UPROPERTY(EditDefaultsOnly, Category = ElectricAbilities)
+	float ElectricAttackHalfHeight = 200.f;
+	UPROPERTY(EditDefaultsOnly, Category = ElectricAbilities)
+	float ElectricAttackDistance = 200.f;
+	UPROPERTY(EditDefaultsOnly, Category = ElectricAbilities)
 	float ElectricAttackCooldown = 0.5f;
 	UPROPERTY(EditDefaultsOnly, Category = ElectricAbilities)
 	int ElectricChainDamage = 10;
