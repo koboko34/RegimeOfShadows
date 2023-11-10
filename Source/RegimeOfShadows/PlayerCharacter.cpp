@@ -97,10 +97,12 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 		EnhancedInputComponent->BindAction(BasicAttackAction, ETriggerEvent::Triggered, this, &APlayerCharacter::BasicAttack);
 		EnhancedInputComponent->BindAction(BasicAbilityAction, ETriggerEvent::Started, this, &APlayerCharacter::BasicAbility);
 		EnhancedInputComponent->BindAction(BasicAbilityAction, ETriggerEvent::Completed, this, &APlayerCharacter::BasicAbilityEnd);
-		EnhancedInputComponent->BindAction(StrongAbilityAction, ETriggerEvent::Started, this, &APlayerCharacter::StrongAbility);
+		EnhancedInputComponent->BindAction(StrongAbilityAction, ETriggerEvent::Triggered, this, &APlayerCharacter::StrongAbility);
+		EnhancedInputComponent->BindAction(StrongAbilityAction, ETriggerEvent::Completed, this, &APlayerCharacter::StrongAbilityEnd);
 		EnhancedInputComponent->BindAction(SwapToFireAction, ETriggerEvent::Started, this, &APlayerCharacter::SwapToFire);
 		EnhancedInputComponent->BindAction(SwapToIceAction, ETriggerEvent::Started, this, &APlayerCharacter::SwapToIce);
 		EnhancedInputComponent->BindAction(SwapToElectricAction, ETriggerEvent::Started, this, &APlayerCharacter::SwapToElectric);
+		EnhancedInputComponent->BindAction(CancelAbilityAction, ETriggerEvent::Started, this, &APlayerCharacter::CancelAbility);
 	}
 }
 
@@ -301,6 +303,22 @@ void APlayerCharacter::StrongAbility(const FInputActionValue& Value)
 	default:
 		break;
 	}
+	
+	bStrongAbilityDown = true;
+}
+
+void APlayerCharacter::StrongAbilityEnd(const FInputActionValue& Value)
+{
+	bStrongAbilityDown = false;
+
+	switch (ActiveElement)
+	{
+	case Element::Fire:
+		AbilityComponent->StrongAbilityFireEnd();
+		break;
+	default:
+		break;
+	}
 }
 
 void APlayerCharacter::SwapToFire(const FInputActionValue& Value)
@@ -354,6 +372,11 @@ void APlayerCharacter::Overcharge(const FInputActionValue& Value)
 	}
 
 	GetWorldTimerManager().SetTimer(OverchargeDurationHandle, OverchargeDelegate, OverchargeDuration, false);
+}
+
+void APlayerCharacter::CancelAbility(const FInputActionValue& Value)
+{
+	AbilityComponent->CancelAbility();
 }
 
 void APlayerCharacter::UseMana(int ManaToUse)

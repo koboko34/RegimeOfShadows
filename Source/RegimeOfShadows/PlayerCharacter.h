@@ -62,6 +62,8 @@ public:
 	UInputAction* SwapToIceAction;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* SwapToElectricAction;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* CancelAbilityAction;
 
 	float SpellSpeed = 1.f;
 
@@ -128,6 +130,8 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = Other, meta = (AllowPrivateAccess = true))
 	int ManaPerTick = 5;
 	bool bRecoverMana = false;
+	
+	bool bStrongAbilityDown = false;
 
 	Element ActiveElement;
 	UPROPERTY(EditAnywhere, Category = Abilities)
@@ -167,6 +171,7 @@ public:
 	UFUNCTION(BlueprintPure)
 	float GetOverchargeCooldown() const { return GetWorldTimerManager().GetTimerRemaining(OverchargeCooldownHandle); }
 
+	bool GetStrongAbilityDown() const { return bStrongAbilityDown; }
 	float GetSpellSpeed() const { return SpellSpeed; }
 	float GetCooldownFactor() const { return CooldownFactor; }
 
@@ -183,12 +188,14 @@ private:
 	void BasicAbility(const FInputActionValue& Value);
 	void BasicAbilityEnd(const FInputActionValue& Value);
 	void StrongAbility(const FInputActionValue& Value);
+	void StrongAbilityEnd(const FInputActionValue& Value);
 
 	void SwapToFire(const FInputActionValue& Value);
 	void SwapToIce(const FInputActionValue& Value);
 	void SwapToElectric(const FInputActionValue& Value);
 
 	void Overcharge(const FInputActionValue& Value);
+	void CancelAbility(const FInputActionValue& Value);
 
 	void LevelUp();
 

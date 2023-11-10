@@ -52,7 +52,6 @@ public:
 	FTimerHandle MeteorShowerHandle;
 	FTimerDelegate MeteorShowerDelegate;
 	float MeteorShowerTimeRemaining;
-	FVector MeteorShowerImpact;
 	UPROPERTY(EditDefaultsOnly, Category = FireAbilities)
 	int FireQManaCost = 15;
 	UPROPERTY(EditDefaultsOnly, Category = FireAbilities)
@@ -149,12 +148,15 @@ private:
 	FTimerDelegate StrongAbilityElectricDelegate;
 
 	float* SpellSpeed;
+	FVector MeteorLocation;
+	bool bCancelAbility = false;
 
 public:
 	void BasicAttackFire();
 	void BasicAbilityFire();
 	void BasicAbilityFireEnd();
 	void StrongAbilityFire();
+	void StrongAbilityFireEnd();
 
 	void BasicAttackIce();
 	void BasicAbilityIce();
@@ -165,6 +167,8 @@ public:
 	void StrongAbilityElectric();
 
 	float GetSpellSpeed() const { return *SpellSpeed; }
+
+	void CancelAbility();
 
 private:
 	UFUNCTION()

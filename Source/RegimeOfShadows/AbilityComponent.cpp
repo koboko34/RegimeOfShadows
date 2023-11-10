@@ -84,6 +84,16 @@ void UAbilityComponent::StrongAbilityFire()
 	if (PlayerCharacter->GetMana() < FireEManaCost || GetWorld()->GetTimerManager().IsTimerActive(StrongAbilityFireHandle))
 		return;
 
+	if (bCancelAbility)
+	{
+		if (MeteorDecal)
+		{
+			MeteorDecal->Destroy();
+			MeteorDecal = nullptr;
+		}
+		return;
+	}
+
 	FHitResult OutHit;
 	FCollisionQueryParams Params;
 	Params.AddIgnoredActor(PlayerCharacter);
@@ -96,20 +106,35 @@ void UAbilityComponent::StrongAbilityFire()
 		ECollisionChannel::ECC_Visibility, Params
 	);
 	
-	DrawDebugLine(GetWorld(), StartLocation, EndLocation, FColor::Red, false, 2.f);
-
 	if (!OutHit.bBlockingHit)
 		return;
 
-	DrawDebugSphere(GetWorld(), OutHit.ImpactPoint, MeteorSpawnRadius, 32, FColor::Red, false, 2.f);
-	
-	FActorSpawnParameters SpawnParams;
-	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	MeteorDecal = GetWorld()->SpawnActor<ADecal>(MeteorDecalClass, OutHit.ImpactPoint, FRotator(90, FMath::RandRange(0, 360), 0), SpawnParams);
-	if (MeteorDecal)
-		MeteorDecal->Decal->DecalSize = FVector(DecalDepth, MeteorSpawnRadius, MeteorSpawnRadius);
+	MeteorLocation = OutHit.ImpactPoint;
+	if (!MeteorDecal)
+	{
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+		MeteorDecal = GetWorld()->SpawnActor<ADecal>(MeteorDecalClass, MeteorLocation, FRotator(90, FMath::RandRange(0, 360), 0), SpawnParams);
+		if (MeteorDecal)
+			MeteorDecal->Decal->DecalSize = FVector(DecalDepth, MeteorSpawnRadius, MeteorSpawnRadius);
+		
+		return;
+	}
 
-	MeteorShowerImpact = OutHit.ImpactPoint;
+	MeteorDecal->SetActorLocation(MeteorLocation);
+}
+
+void UAbilityComponent::StrongAbilityFireEnd()
+{
+	if (bCancelAbility)
+	{
+		bCancelAbility = false;
+		return;
+	}
+	
+	if (GetWorld()->GetTimerManager().IsTimerActive(StrongAbilityFireHandle) || PlayerCharacter->GetMana() < FireEManaCost || !MeteorDecal)
+		return;
+		
 	MeteorShowerTimeRemaining = MeteorShowerDuration;
 	GetWorld()->GetTimerManager().SetTimer(MeteorShowerHandle, MeteorShowerDelegate, MeteorSpawnInterval, true);
 
@@ -138,7 +163,8 @@ void UAbilityComponent::BasicAbilityIce()
 
 void UAbilityComponent::StrongAbilityIce()
 {
-	if (PlayerCharacter->GetMana() < SnowGlobeManaCost || GetWorld()->GetTimerManager().IsTimerActive(StrongAbilityIceHandle))
+	if (PlayerCharacter->GetMana() < SnowGlobeManaCost || GetWorld()->GetTimerManager().IsTimerActive(StrongAbilityIceHandle) ||
+		PlayerCharacter->GetStrongAbilityDown())
 		return;
 
 	TriggerCooldown(StrongAbilityIceHandle, SnowGlobeCooldown);
@@ -229,7 +255,7 @@ void UAbilityComponent::BasicAbilityElectric()
 
 void UAbilityComponent::StrongAbilityElectric()
 {
-	if (PlayerCharacter->GetMana() < ElectricStrongManaCost)
+	if (PlayerCharacter->GetMana() < ElectricStrongManaCost || PlayerCharacter->GetStrongAbilityDown())
 		return;
 
 	FActorSpawnParameters SpawnParams;
@@ -296,10 +322,15 @@ void UAbilityComponent::StrongAbilityElectric()
 	FirstPortal->Init(SecondPortal, this);
 }
 
+void UAbilityComponent::CancelAbility()
+{
+	bCancelAbility = true;
+}
+
 void UAbilityComponent::MeteorShower()
 {
 	FVector RandomOffset = FVector(FMath::RandRange(-MeteorSpawnRadius, MeteorSpawnRadius), FMath::RandRange(-MeteorSpawnRadius, MeteorSpawnRadius), MeteorShowerHeightOffset);
-	FVector SpawnLocation = MeteorShowerImpact + RandomOffset;
+	FVector SpawnLocation = MeteorLocation + RandomOffset;
 	FActorSpawnParameters Params;
 	Params.Owner = PlayerCharacter;
 	Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
