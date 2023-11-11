@@ -59,7 +59,7 @@ float APlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 
 	if (DamageCauser != this)
-		Flow /= 2;
+		Flow = std::max(0, Flow - 5);
 
 	return DamageAmount;
 }
@@ -202,7 +202,7 @@ void APlayerCharacter::Dodge(const FInputActionValue& Value)
 	GetWorldTimerManager().SetTimer(DodgeHandle, DodgeDelegate, DodgeDuration, false);
 
 	// ==================== FOR TESTING ONLY
-	Flow++;
+	Flow = std::min(MaxFlow, Flow + 1);
 }
 
 void APlayerCharacter::Interact(const FInputActionValue& Value)
