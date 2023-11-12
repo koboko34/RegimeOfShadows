@@ -20,6 +20,7 @@ AProjectile::AProjectile()
 
 	SphereCollider = CreateDefaultSubobject<USphereComponent>("SphereCollider");
 	SphereCollider->SetupAttachment(Mesh);
+	SphereCollider->SetCollisionObjectType(ECollisionChannel::ECC_GameTraceChannel1);
 
 	ProjectileMovementComponent = CreateDefaultSubobject<UProjectileMovementComponent>("ProjectileMovementComponent");
 }
@@ -59,7 +60,7 @@ void AProjectile::HandleExplosion(TArray<FHitResult>& HitResultsOut, bool bDrawD
 	for (const FHitResult& HitResult : HitResults)
 	{
 		Enemy = Cast<AEnemy>(HitResult.GetActor());
-		if (!Enemy)
+		if (!Enemy || !Enemy->GetIsAlive())
 			continue;
 
 		UGameplayStatics::ApplyDamage(

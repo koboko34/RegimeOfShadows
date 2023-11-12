@@ -4,10 +4,16 @@
 #include "Enemy.h"
 #include "Kismet/GameplayStatics.h"
 #include "PlayerCharacter.h"
+#include "Components/CapsuleComponent.h"
 
 AEnemy::AEnemy()
 {
 	CalculateKillExp();
+
+	Root = CreateDefaultSubobject<USceneComponent>("Root");
+	SetRootComponent(Root);
+	GetCapsuleComponent()->SetupAttachment(Root);
+	GetMesh()->SetRelativeRotation(FRotator(0.f, -90.f, 0.f));
 
 	ClearBurningDelegate.BindUObject(this, &AEnemy::ClearBurning);
 	ClearWetDelegate.BindUObject(this, &AEnemy::ClearWet);
@@ -15,6 +21,8 @@ AEnemy::AEnemy()
 	ClearChargedDelegate.BindUObject(this, &AEnemy::ClearCharged);
 
 	ApplyDOTDelegate.BindUObject(this, &AEnemy::ApplyDOT);
+
+	DestroyDelegate.BindUObject(this, &AEnemy::DestroyAfterDeath);
 }
 
 void AEnemy::BeginPlay()
@@ -31,7 +39,7 @@ float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AC
 	UE_LOG(LogTemp, Warning, TEXT("Enemy Health: %i"), Health);
 	if (Health <= 0)
 	{
-		Destroy();
+		Death();
 	}
 	return DamageAmount;
 }
@@ -141,4 +149,16 @@ void AEnemy::ApplyDOT()
 		UGameplayStatics::GetPlayerController(this, 0),
 		UGameplayStatics::GetPlayerCharacter(this, 0),
 		UDamageType::StaticClass());
+}
+
+void AEnemy::Death()
+{
+	bIsAlive = false;
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_GameTraceChannel1, ECollisionResponse::ECR_Ignore);
+	GetWorldTimerManager().SetTimer(DestroyHandle, DestroyDelegate, DeathDestroyDelay, false);
+}
+
+void AEnemy::DestroyAfterDeath()
+{
+	Destroy();
 }

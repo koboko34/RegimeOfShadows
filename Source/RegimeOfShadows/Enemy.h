@@ -25,6 +25,10 @@ class REGIMEOFSHADOWS_API AEnemy : public ABaseEntity
 public:
 	AEnemy();
 
+	UPROPERTY(EditAnywhere)
+	USceneComponent* Root;
+
+public:
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 
 protected:
@@ -66,6 +70,9 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = Stats, meta = (AllowPrivateAccess = true))
 	int ElectricDOTInterval = 2;
 
+	UPROPERTY(EditAnywhere, Category = Stats, meta = (AllowPrivateAccess = true))
+	float DeathDestroyDelay = 10.f;
+
 	FTimerHandle ClearBurningHandle;
 	FTimerHandle ClearWetHandle;
 	FTimerHandle ClearFrostHandle;
@@ -78,6 +85,9 @@ private:
 
 	FTimerHandle ApplyDOTHandle;
 	FTimerDelegate ApplyDOTDelegate;
+
+	FTimerHandle DestroyHandle;
+	FTimerDelegate DestroyDelegate;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Effects, meta = (AllowPrivateAccess = true))
 	UMaterialInterface* BurningMaterial;
@@ -106,5 +116,9 @@ private:
 	void StartDOT();
 	UFUNCTION()
 	void ApplyDOT();
+
+	void Death();
+	UFUNCTION()
+	void DestroyAfterDeath();
 	
 };

@@ -75,6 +75,9 @@ void ASnowGlobe::HandleTick()
 		}
 
 		Enemy = Cast<AEnemy>(HitResult.GetActor());
+		if (!Enemy->GetIsAlive())
+			continue;
+
 		if (Enemy)
 		{
 			if (Enemy->StatusEffects.Burning)
