@@ -61,6 +61,8 @@ float APlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 	if (DamageCauser != this)
 		Flow = std::max(0, Flow - 5);
 
+	UE_LOG(LogTemp, Warning, TEXT("Player has %i health remaining"), Health);
+
 	return DamageAmount;
 }
 
@@ -200,9 +202,6 @@ void APlayerCharacter::Dodge(const FInputActionValue& Value)
 	GetCharacterMovement()->StopMovementImmediately();
 	LaunchCharacter(LaunchVector, false, false);
 	GetWorldTimerManager().SetTimer(DodgeHandle, DodgeDelegate, DodgeDuration, false);
-
-	// ==================== FOR TESTING ONLY
-	Flow = std::min(MaxFlow, Flow + 1);
 }
 
 void APlayerCharacter::Interact(const FInputActionValue& Value)
