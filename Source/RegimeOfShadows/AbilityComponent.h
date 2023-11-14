@@ -49,6 +49,8 @@ public:
 	float MeteorSpawnRadius = 100.f;
 	UPROPERTY(EditDefaultsOnly, Category = FireAbilities)
 	float MeteorShowerHeightOffset = 1000.f;
+	UPROPERTY(EditDefaultsOnly, Category = FireAbilities)
+	float MeteorShowerCastDuration = 2.f;
 	FTimerHandle MeteorShowerHandle;
 	FTimerDelegate MeteorShowerDelegate;
 	float MeteorShowerTimeRemaining;
@@ -147,6 +149,9 @@ private:
 	FTimerHandle StrongAbilityElectricHandle;
 	FTimerDelegate StrongAbilityElectricDelegate;
 
+	FTimerHandle MeteorShowerCastHandle;
+	FTimerDelegate MeteorShowerCastDelegate;
+
 	float* SpellSpeed;
 	FVector MeteorLocation;
 	bool bCancelAbility = false;
@@ -171,6 +176,8 @@ public:
 	void CancelAbility();
 
 private:
+	UFUNCTION()
+	void MeteorShowerCast();
 	UFUNCTION()
 	void MeteorShower();
 	

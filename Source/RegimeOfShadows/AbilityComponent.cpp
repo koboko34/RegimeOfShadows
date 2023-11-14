@@ -28,7 +28,9 @@ UAbilityComponent::UAbilityComponent()
 	SpellSpeed = &PlayerCharacter->SpellSpeed;
 
 	MeteorShowerDelegate.BindUObject(this, &UAbilityComponent::MeteorShower);
+	MeteorShowerCastDelegate.BindUObject(this, &UAbilityComponent::MeteorShowerCast);
 	PortalSpawnDelegate.BindUObject(this, &UAbilityComponent::CancelPortalSpawn);
+
 }
 
 void UAbilityComponent::BeginPlay()
@@ -135,11 +137,7 @@ void UAbilityComponent::StrongAbilityFireEnd()
 	if (GetWorld()->GetTimerManager().IsTimerActive(StrongAbilityFireHandle) || PlayerCharacter->GetMana() < FireEManaCost || !MeteorDecal)
 		return;
 		
-	MeteorShowerTimeRemaining = MeteorShowerDuration;
-	GetWorld()->GetTimerManager().SetTimer(MeteorShowerHandle, MeteorShowerDelegate, MeteorSpawnInterval, true);
-
-	TriggerCooldown(StrongAbilityFireHandle, FireECooldown);
-	PlayerCharacter->UseMana(FireEManaCost);
+	GetWorld()->GetTimerManager().SetTimer(MeteorShowerCastHandle, MeteorShowerCastDelegate, MeteorShowerCastDuration, false);
 }
 
 void UAbilityComponent::BasicAttackIce()
@@ -325,6 +323,15 @@ void UAbilityComponent::StrongAbilityElectric()
 void UAbilityComponent::CancelAbility()
 {
 	bCancelAbility = true;
+}
+
+void UAbilityComponent::MeteorShowerCast()
+{
+	MeteorShowerTimeRemaining = MeteorShowerDuration;
+	GetWorld()->GetTimerManager().SetTimer(MeteorShowerHandle, MeteorShowerDelegate, MeteorSpawnInterval, true);
+
+	TriggerCooldown(StrongAbilityFireHandle, FireECooldown);
+	PlayerCharacter->UseMana(FireEManaCost);
 }
 
 void UAbilityComponent::MeteorShower()
