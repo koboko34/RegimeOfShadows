@@ -320,6 +320,19 @@ void UAbilityComponent::StrongAbilityElectric()
 	FirstPortal->Init(SecondPortal, this);
 }
 
+void UAbilityComponent::CancelAbilityCast()
+{
+	if (!GetWorld()->GetTimerManager().IsTimerActive(MeteorShowerCastHandle))
+		return;
+
+	GetWorld()->GetTimerManager().ClearTimer(MeteorShowerCastHandle);
+	if (MeteorDecal)
+	{
+		MeteorDecal->Destroy();
+		MeteorDecal = nullptr;
+	}
+}
+
 void UAbilityComponent::CancelAbility()
 {
 	bCancelAbility = true;
@@ -533,4 +546,15 @@ float UAbilityComponent::GetElectricECooldown() const
 		return GetWorld()->GetTimerManager().GetTimerRemaining(StrongAbilityElectricHandle);
 
 	return 0.f;
+}
+
+float UAbilityComponent::GetCastProgress() const
+{
+	if (GetWorld()->GetTimerManager().IsTimerActive(MeteorShowerCastHandle))
+	{
+		float Elapsed = GetWorld()->GetTimerManager().GetTimerElapsed(MeteorShowerCastHandle);	
+		return Elapsed / (GetWorld()->GetTimerManager().GetTimerRemaining(MeteorShowerCastHandle) + Elapsed);
+	}
+	
+	return -1.f;
 }
