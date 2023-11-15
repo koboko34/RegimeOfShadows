@@ -173,6 +173,7 @@ public:
 
 	float GetSpellSpeed() const { return *SpellSpeed; }
 
+	void CancelAbilityCast();
 	void CancelAbility();
 
 private:
@@ -213,4 +214,7 @@ public:
 	float GetElectricQCooldown() const;
 	UFUNCTION(BlueprintPure)
 	float GetElectricECooldown() const;
+
+	UFUNCTION(BlueprintPure)
+	float GetCastProgress() const;
 };

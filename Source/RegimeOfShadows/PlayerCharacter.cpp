@@ -139,6 +139,8 @@ void APlayerCharacter::Move(const FInputActionValue& Value)
 		AddMovementInput(GetActorForwardVector(), MovementVector.Y);
 		AddMovementInput(GetActorRightVector(), MovementVector.X);
 	}
+
+	AbilityComponent->CancelAbilityCast();
 }
 
 void APlayerCharacter::Look(const FInputActionValue& Value)
