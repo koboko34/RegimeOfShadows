@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Armand Yilinkou, 2023
 
 
 #include "ElectricPortal.h"
@@ -24,7 +24,6 @@ void AElectricPortal::BeginPlay()
 	
 	PlayerActor = Cast<AActor>(UGameplayStatics::GetPlayerCharacter(this, 0));
 	PlayerController = UGameplayStatics::GetPlayerController(this, 0);
-
 }
 
 void AElectricPortal::Init(AElectricPortal* Portal, UAbilityComponent* InAbilityComponent)

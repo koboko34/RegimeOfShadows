@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Armand Yilinkou, 2023
 
 
 #include "Projectile.h"
@@ -7,10 +7,8 @@
 #include "Enemy.h"
 #include "Kismet/GameplayStatics.h"
 
-// Sets default values
 AProjectile::AProjectile()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
 
 	Mesh = CreateDefaultSubobject<UStaticMeshComponent>("Mesh");
@@ -23,13 +21,6 @@ AProjectile::AProjectile()
 	SphereCollider->SetCollisionObjectType(ECollisionChannel::ECC_GameTraceChannel1);
 
 	ProjectileMovementComponent = CreateDefaultSubobject<UProjectileMovementComponent>("ProjectileMovementComponent");
-}
-
-// Called when the game starts or when spawned
-void AProjectile::BeginPlay()
-{
-	Super::BeginPlay();
-	
 }
 
 void AProjectile::HandleExplosion(TArray<FHitResult>& HitResultsOut, bool bDrawDebug, FColor Colour, float DamageMultiplier)

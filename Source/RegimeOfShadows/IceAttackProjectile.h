@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Armand Yilinkou, 2023
 
 #pragma once
 
@@ -8,9 +8,6 @@
 
 class APlayerCharacter;
 
-/**
- * 
- */
 UCLASS()
 class REGIMEOFSHADOWS_API AIceAttackProjectile : public AProjectile
 {

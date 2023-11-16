@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Armand Yilinkou, 2023
 
 #pragma once
 
@@ -6,9 +6,6 @@
 #include "Projectile.h"
 #include "WaterBasicProjectile.generated.h"
 
-/**
- * 
- */
 UCLASS()
 class REGIMEOFSHADOWS_API AWaterBasicProjectile : public AProjectile
 {

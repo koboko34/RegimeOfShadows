@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Armand Yilinkou, 2023
 
 
 #include "SnowGlobe.h"
@@ -7,16 +7,13 @@
 #include "Kismet/GameplayStatics.h"
 #include "Enemy.h"
 
-// Sets default values
 ASnowGlobe::ASnowGlobe()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 	TickDelegate.BindUObject(this, &ASnowGlobe::HandleTick);
 }
 
-// Called when the game starts or when spawned
 void ASnowGlobe::BeginPlay()
 {
 	Super::BeginPlay();
@@ -28,13 +25,6 @@ void ASnowGlobe::BeginPlay()
 	GetWorldTimerManager().SetTimer(TickHandle, TickDelegate, Interval, true);
 
 	// DrawDebugSphere(GetWorld(), GetActorLocation(), Radius, 32, FColor::Cyan, false, Lifetime);
-}
-
-// Called every frame
-void ASnowGlobe::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
 }
 
 void ASnowGlobe::HandleTick()

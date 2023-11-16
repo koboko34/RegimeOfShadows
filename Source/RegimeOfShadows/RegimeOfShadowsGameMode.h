@@ -1,4 +1,4 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
+// Armand Yilinkou, 2023
 
 #pragma once
 

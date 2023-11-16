@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Armand Yilinkou, 2023
 
 
 #include "FireBasicProjectile.h"
@@ -9,7 +9,6 @@
 #include "PlayerCharacter.h"
 #include "Camera/CameraComponent.h"
 #include "AbilityComponent.h"
-
 
 AFireBasicProjectile::AFireBasicProjectile()
 {
