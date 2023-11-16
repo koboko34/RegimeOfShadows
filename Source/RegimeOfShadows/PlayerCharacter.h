@@ -1,10 +1,11 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Armand Yilinkou, 2023
 
 #pragma once
 
 #include "CoreMinimal.h"
 #include "BaseEntity.h"
 #include "InputActionValue.h"
+#include "LifeStealInterface.h"
 #include "PlayerCharacter.generated.h"
 
 class UCameraComponent;
@@ -22,7 +23,7 @@ enum class Element : uint8
 };
 
 UCLASS()
-class REGIMEOFSHADOWS_API APlayerCharacter : public ABaseEntity
+class REGIMEOFSHADOWS_API APlayerCharacter : public ABaseEntity, public ILifeStealInterface
 {
 	GENERATED_BODY()
 
@@ -92,6 +93,8 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category = Combat, meta = (AllowPrivateAccess = true))
 	float DodgeDuration = 1.f;
+	UPROPERTY(EditDefaultsOnly, Category = Combat, meta = (AllowPrivateAccess = true))
+	float LifeStealPerFlow = 0.01f;
 	FTimerHandle DodgeHandle;
 	FTimerDelegate DodgeDelegate;
 	int Flow = 0;
@@ -143,6 +146,8 @@ private:
 public:
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 	
+	virtual void ApplyLifeSteal(float Damage) override;
+
 	UCameraComponent* GetCameraComponent() const { return Camera; }
 
 protected:
@@ -152,8 +157,10 @@ protected:
 
 public:
 	void AddExp(int ExpToAdd);
+	void AddHealth(int HealthToAdd);
 	void AddMana(int ManaToAdd);
 	void UseMana(int ManaToUse);
+
 
 	void ResetFireQProj();
 
@@ -212,4 +219,5 @@ private:
 	void OverchargeEnd();
 	UFUNCTION()
 	void FireOverchargeDOT();
+
 };

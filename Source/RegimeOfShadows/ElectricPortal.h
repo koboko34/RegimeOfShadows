@@ -30,6 +30,7 @@ private:
 	float RemainingTime;
 
 	AActor* PlayerActor;
+	AController* PlayerController;
 
 	UAbilityComponent* AbilityComponent;
 

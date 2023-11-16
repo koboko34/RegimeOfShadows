@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Armand Yilinkou, 2023
 
 
 #include "PlayerCharacter.h"
@@ -66,6 +66,14 @@ float APlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 	return DamageAmount;
 }
 
+void APlayerCharacter::ApplyLifeSteal(float Damage)
+{
+	if (Flow <= 0)
+		return;
+
+	AddHealth(Damage * (LifeStealPerFlow * Flow));
+}
+
 void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
@@ -115,6 +123,13 @@ void APlayerCharacter::AddExp(int ExpToAdd)
 	Experience += ExpToAdd;
 	if (Experience > ExpToNextLevel)
 		LevelUp();
+}
+
+void APlayerCharacter::AddHealth(int HealthToAdd)
+{
+	Health = std::min(MaxHealth, Health + HealthToAdd);
+
+	UE_LOG(LogTemp, Warning, TEXT("Health: %i"), Health);
 }
 
 void APlayerCharacter::AddMana(int ManaToAdd)

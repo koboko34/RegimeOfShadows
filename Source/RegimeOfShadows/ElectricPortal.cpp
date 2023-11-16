@@ -23,6 +23,8 @@ void AElectricPortal::BeginPlay()
 	Super::BeginPlay();
 	
 	PlayerActor = Cast<AActor>(UGameplayStatics::GetPlayerCharacter(this, 0));
+	PlayerController = UGameplayStatics::GetPlayerController(this, 0);
+
 }
 
 void AElectricPortal::Init(AElectricPortal* Portal, UAbilityComponent* InAbilityComponent)
@@ -81,7 +83,6 @@ void AElectricPortal::Sweep()
 	);
 
 	AEnemy* Enemy;
-	AController* PlayerController = UGameplayStatics::GetPlayerController(this, 0);
 	for (const FHitResult& HitResult : HitResults)
 	{
 		Enemy = Cast<AEnemy>(HitResult.GetActor());
