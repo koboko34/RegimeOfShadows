@@ -10,9 +10,7 @@ AEnemy::AEnemy()
 {
 	CalculateKillExp();
 
-	Root = CreateDefaultSubobject<USceneComponent>("Root");
-	SetRootComponent(Root);
-	GetCapsuleComponent()->SetupAttachment(Root);
+	SetRootComponent(GetCapsuleComponent());
 	GetMesh()->SetRelativeRotation(FRotator(0.f, -90.f, 0.f));
 
 	ClearBurningDelegate.BindUObject(this, &AEnemy::ClearBurning);
