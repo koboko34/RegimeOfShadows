@@ -8,6 +8,9 @@
 
 AEnemy::AEnemy()
 {
+	AttackPoint = CreateDefaultSubobject<USceneComponent>("AttackPoint");
+	AttackPoint->SetupAttachment(RootComponent);
+	
 	CalculateKillExp();
 
 	SetRootComponent(GetCapsuleComponent());
