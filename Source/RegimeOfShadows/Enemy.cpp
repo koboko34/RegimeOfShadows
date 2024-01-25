@@ -5,6 +5,9 @@
 #include "Kismet/GameplayStatics.h"
 #include "PlayerCharacter.h"
 #include "Components/CapsuleComponent.h"
+#include "AIController.h"
+// #include "BrainComponent.h"
+#include "BehaviorTree/BlackboardComponent.h"
 
 AEnemy::AEnemy()
 {
@@ -31,6 +34,12 @@ void AEnemy::BeginPlay()
 	Super::BeginPlay();
 
 	ClearStatusEffects();
+
+	AAIController* EnemyController = Cast<AAIController>(GetController());
+	if (EnemyController)
+	{
+		EnemyController->GetBlackboardComponent()->SetValueAsBool(FName("bSensesPlayer"), false);
+	}
 }
 
 float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
@@ -157,6 +166,16 @@ void AEnemy::Death()
 {
 	bIsAlive = false;
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_GameTraceChannel1, ECollisionResponse::ECR_Ignore);
+
+	AAIController* EnemyController = Cast<AAIController>(GetController());
+	if (EnemyController)
+	{
+		EnemyController->StopMovement();
+		EnemyController->GetBlackboardComponent()->SetValueAsBool(FName("isDead"), true);
+		// EnemyController->GetBrainComponent()->StopLogic(TEXT("Enemy died, stopping logic.\n"));
+	}
+	
+	DetachFromControllerPendingDestroy();
 	GetWorldTimerManager().SetTimer(DestroyHandle, DestroyDelegate, DeathDestroyDelay, false);
 }
 

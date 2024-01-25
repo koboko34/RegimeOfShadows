@@ -140,6 +140,11 @@ private:
 	UPROPERTY(EditAnywhere, Category = Abilities)
 	UAbilityComponent* AbilityComponent;
 
+	class UPawnNoiseEmitterComponent* PawnNoiseEmitterComponent;
+
+	FTimerHandle NoiseHandle;
+	FTimerDelegate NoiseDelegate;
+
 	FTimerHandle StatsTickHandle;
 	FTimerDelegate StatsTickDelegate;
 
@@ -219,5 +224,8 @@ private:
 	void OverchargeEnd();
 	UFUNCTION()
 	void FireOverchargeDOT();
+
+	UFUNCTION()
+	void MakePawnNoise();
 
 };

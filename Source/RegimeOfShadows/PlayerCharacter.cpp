@@ -11,6 +11,7 @@
 #include "AbilityComponent.h"
 #include "FireBasicProjectile.h"
 #include "Kismet/GameplayStatics.h"
+#include "Components/PawnNoiseEmitterComponent.h"
 
 APlayerCharacter::APlayerCharacter()
 {
@@ -38,10 +39,13 @@ APlayerCharacter::APlayerCharacter()
 	Experience = 0;
 	ExpToNextLevel = pow(2, Level) * 10;
 
+	PawnNoiseEmitterComponent = CreateDefaultSubobject<UPawnNoiseEmitterComponent>("PawnNoiseEmitterComponent");
+
 	StatsTickDelegate.BindUObject(this, &APlayerCharacter::StatsTick);
 	OverchargeDelegate.BindUObject(this, &APlayerCharacter::OverchargeEnd);
 	OverchargeDOTDelegate.BindUObject(this, &APlayerCharacter::FireOverchargeDOT);
 	DodgeDelegate.BindUObject(this, &APlayerCharacter::DodgeEnd);
+	NoiseDelegate.BindUObject(this, &APlayerCharacter::MakePawnNoise);
 }
 
 float APlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
@@ -87,6 +91,7 @@ void APlayerCharacter::BeginPlay()
 	}
 
 	GetWorldTimerManager().SetTimer(StatsTickHandle, StatsTickDelegate, 0.5f, true);
+	GetWorldTimerManager().SetTimer(NoiseHandle, NoiseDelegate, 0.5f, true);
 }
 
 void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -481,4 +486,9 @@ void APlayerCharacter::FireOverchargeDOT()
 	RemainingTimeDOT -= 1;
 	if (RemainingTimeDOT <= 0)
 		GetWorldTimerManager().ClearTimer(OverchargeDOTHandle);
+}
+
+void APlayerCharacter::MakePawnNoise()
+{
+	PawnNoiseEmitterComponent->MakeNoise(this, 1.f, GetActorLocation());
 }
