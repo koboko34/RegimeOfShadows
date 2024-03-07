@@ -13,6 +13,11 @@ struct StatusEffects {
 	bool Charged = false;
 };
 
+class UPawnSensingComponent;
+class UBlackboardComponent;
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FHearNoiseDelegate, APawn*, Instigator, const FVector&, Location, float, Volume);
+
 UCLASS()
 class REGIMEOFSHADOWS_API AEnemy : public ABaseEntity
 {
@@ -23,6 +28,17 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	USceneComponent* AttackPoint;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	UPawnSensingComponent* PawnSensingComponent;
+	
+	UBlackboardComponent* BlackboardComponent;
+
+	UPROPERTY(BlueprintReadOnly)
+	FVector InitialLocation;
+
+	UPROPERTY(EditDefaultsOnly)
+	float ChaseRange = 2000.f;
 
 public:
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
@@ -50,6 +66,9 @@ public:
 	UFUNCTION(BlueprintImplementableEvent)
 	void RemoveStatusMaterial();
 
+	UFUNCTION()
+	void OnHearNoise(APawn* OtherActor, const FVector& Location, float Volume);
+
 private:
 	UPROPERTY(VisibleAnywhere, Category = Stats, meta = (AllowPrivateAccess = true))
 	int ExpOnKill;
@@ -69,6 +88,9 @@ private:
 	UPROPERTY(EditAnywhere, Category = Stats, meta = (AllowPrivateAccess = true))
 	float DeathDestroyDelay = 10.f;
 
+	UPROPERTY(EditDefaultsOnly, Category = AI, meta = (AllowPrivateAccess = true))
+	float HearingRange = 2000.f;
+
 	FTimerHandle ClearBurningHandle;
 	FTimerHandle ClearWetHandle;
 	FTimerHandle ClearFrostHandle;
@@ -84,6 +106,9 @@ private:
 
 	FTimerHandle DestroyHandle;
 	FTimerDelegate DestroyDelegate;
+
+	FTimerHandle RangeCheckHandle;
+	FTimerDelegate RangeCheckDelegate;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Effects, meta = (AllowPrivateAccess = true))
 	UMaterialInterface* BurningMaterial;
@@ -116,5 +141,9 @@ private:
 	void Death();
 	UFUNCTION()
 	void DestroyAfterDeath();
+
+	UFUNCTION()
+	void RangeCheck();
 	
+	bool InChaseRange();
 };

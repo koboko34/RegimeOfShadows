@@ -64,3 +64,8 @@ float ABaseEntity::CalcRageFactor() const
 
 	return 1 - ((float)Health / (float)MaxHealth);
 }
+
+void ABaseEntity::SetHealth(int HealthToSet)
+{
+	Health = HealthToSet;
+}

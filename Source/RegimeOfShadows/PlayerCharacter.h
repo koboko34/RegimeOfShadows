@@ -155,6 +155,9 @@ public:
 
 	UCameraComponent* GetCameraComponent() const { return Camera; }
 
+	UFUNCTION(BlueprintCallable)
+	Element GetActiveElement() const { return ActiveElement; }
+
 protected:
 	virtual void BeginPlay() override;
 

@@ -160,6 +160,8 @@ void APlayerCharacter::Move(const FInputActionValue& Value)
 		AddMovementInput(GetActorRightVector(), MovementVector.X);
 	}
 
+	MakeNoise(1.f, this, GetActorLocation(), 1000.f, FName("WalkingNoise"));
+	MakeNoise(1.f, this, GetActorLocation(), 1000.f, FName("WalkingNoise"));
 	AbilityComponent->CancelAbilityCast();
 }
 

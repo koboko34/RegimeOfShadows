@@ -6,13 +6,24 @@
 #include "PlayerCharacter.h"
 #include "Components/CapsuleComponent.h"
 #include "AIController.h"
-// #include "BrainComponent.h"
 #include "BehaviorTree/BlackboardComponent.h"
+#include "Perception/PawnSensingComponent.h"
+
 
 AEnemy::AEnemy()
 {
 	AttackPoint = CreateDefaultSubobject<USceneComponent>("AttackPoint");
 	AttackPoint->SetupAttachment(RootComponent);
+
+	PawnSensingComponent = CreateDefaultSubobject<UPawnSensingComponent>("PawnSensingComponent");
+	PawnSensingComponent->bHearNoises = true;
+	PawnSensingComponent->bSeePawns = false;
+	PawnSensingComponent->bOnlySensePlayers = true;
+	PawnSensingComponent->HearingThreshold = HearingRange;
+	PawnSensingComponent->LOSHearingThreshold = HearingRange;
+
+	PawnSensingComponent->OnHearNoise.AddDynamic(this, &AEnemy::OnHearNoise);
+	RangeCheckDelegate.BindUObject(this, &AEnemy::RangeCheck);
 	
 	CalculateKillExp();
 
@@ -36,10 +47,12 @@ void AEnemy::BeginPlay()
 	ClearStatusEffects();
 
 	AAIController* EnemyController = Cast<AAIController>(GetController());
-	if (EnemyController)
-	{
-		EnemyController->GetBlackboardComponent()->SetValueAsBool(FName("bSensesPlayer"), false);
-	}
+	BlackboardComponent = EnemyController->GetBlackboardComponent();
+	BlackboardComponent->SetValueAsBool(FName("bSensesPlayer"), false);
+	InitialLocation = GetActorLocation();
+	BlackboardComponent->SetValueAsVector(FName("InitialLocation"), InitialLocation);
+
+	GetWorldTimerManager().SetTimer(RangeCheckHandle, RangeCheckDelegate, 1.f, true);
 }
 
 float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
@@ -98,6 +111,13 @@ void AEnemy::ClearStatusEffects()
 	RemoveStatusMaterial();
 
 	GetWorldTimerManager().ClearAllTimersForObject(this);
+}
+
+void AEnemy::OnHearNoise(APawn* OtherActor, const FVector& Location, float Volume)
+{
+	UE_LOG(LogTemp, Warning, TEXT("Heard actor!"));
+
+	BlackboardComponent->SetValueAsBool(FName("bSensesPlayer"), true);
 }
 
 void AEnemy::GiveKillExp()
@@ -182,4 +202,21 @@ void AEnemy::Death()
 void AEnemy::DestroyAfterDeath()
 {
 	Destroy();
+}
+
+void AEnemy::RangeCheck()
+{
+	bool InRange = InChaseRange();
+	BlackboardComponent->SetValueAsBool(FName("bInChaseRange"), InRange);
+
+	if (!InRange)
+	{
+		BlackboardComponent->SetValueAsBool(FName("bSensesPlayer"), false);
+	}
+}
+
+bool AEnemy::InChaseRange()
+{
+	float Dist = FVector::Distance(InitialLocation, GetActorLocation());
+	return Dist < ChaseRange;
 }

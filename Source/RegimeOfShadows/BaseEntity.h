@@ -76,4 +76,7 @@ public:
 	bool GetIsAlive() const { return bIsAlive; }
 	float CalcRageFactor() const;
 
+	UFUNCTION(BlueprintCallable)
+	void SetHealth(int HealthToSet);
+
 };
