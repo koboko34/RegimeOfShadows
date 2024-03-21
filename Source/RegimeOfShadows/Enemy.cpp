@@ -192,9 +192,9 @@ void AEnemy::Death()
 	{
 		EnemyController->StopMovement();
 		EnemyController->GetBlackboardComponent()->SetValueAsBool(FName("isDead"), true);
-		// EnemyController->GetBrainComponent()->StopLogic(TEXT("Enemy died, stopping logic.\n"));
 	}
 	
+	PawnSensingComponent->Deactivate();
 	DetachFromControllerPendingDestroy();
 	GetWorldTimerManager().SetTimer(DestroyHandle, DestroyDelegate, DeathDestroyDelay, false);
 }

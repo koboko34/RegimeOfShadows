@@ -50,6 +50,11 @@ APlayerCharacter::APlayerCharacter()
 
 float APlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
+	if (!bIsAlive)
+	{
+		return DamageAmount;
+	}
+	
 	if (GetWorldTimerManager().IsTimerActive(DodgeHandle) && DamageCauser != this)
 	{
 		if (DodgedActors.Contains(DamageCauser))
@@ -66,6 +71,11 @@ float APlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 		Flow = std::max(0, Flow - 5);
 
 	UE_LOG(LogTemp, Warning, TEXT("Player has %i health remaining"), Health);
+
+	if (Health <= 0)
+	{
+		PlayerDeath();
+	}
 
 	return DamageAmount;
 }
@@ -92,6 +102,8 @@ void APlayerCharacter::BeginPlay()
 
 	GetWorldTimerManager().SetTimer(StatsTickHandle, StatsTickDelegate, 0.5f, true);
 	GetWorldTimerManager().SetTimer(NoiseHandle, NoiseDelegate, 0.5f, true);
+
+	EnableInput(UGameplayStatics::GetPlayerController(this, 0));
 }
 
 void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -493,4 +505,12 @@ void APlayerCharacter::FireOverchargeDOT()
 void APlayerCharacter::MakePawnNoise()
 {
 	PawnNoiseEmitterComponent->MakeNoise(this, 1.f, GetActorLocation());
+}
+
+void APlayerCharacter::PlayerDeath()
+{
+	UE_LOG(LogTemp, Warning, TEXT("PlayerDeath() trigerred."));
+	
+	bIsAlive = false;
+	DisableInput(UGameplayStatics::GetPlayerController(this, 0));
 }

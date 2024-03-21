@@ -169,7 +169,6 @@ public:
 	void AddMana(int ManaToAdd);
 	void UseMana(int ManaToUse);
 
-
 	void ResetFireQProj();
 
 	UFUNCTION(BlueprintPure)
@@ -230,5 +229,7 @@ private:
 
 	UFUNCTION()
 	void MakePawnNoise();
+
+	void PlayerDeath();
 
 };

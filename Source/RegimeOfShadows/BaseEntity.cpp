@@ -44,6 +44,7 @@ float ABaseEntity::TakeDamage(float DamageAmount, FDamageEvent const& DamageEven
 	if (AdjustedDamage > Health)
 	{
 		Health = 0;
+		bIsAlive = false;
 	}
 	else
 	{
