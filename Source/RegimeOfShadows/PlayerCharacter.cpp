@@ -118,6 +118,7 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 		EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Completed, this, &APlayerCharacter::StopSprint);
 
 		EnhancedInputComponent->BindAction(ToggleMapAction, ETriggerEvent::Started, this, &APlayerCharacter::ToggleMap);
+		EnhancedInputComponent->BindAction(PauseAction, ETriggerEvent::Started, this, &APlayerCharacter::Pause);
 		EnhancedInputComponent->BindAction(DodgeAction, ETriggerEvent::Started, this, &APlayerCharacter::Dodge);
 		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Started, this, &APlayerCharacter::Interact);
 		EnhancedInputComponent->BindAction(OverchargeAction, ETriggerEvent::Started, this, &APlayerCharacter::Overcharge);
@@ -265,6 +266,11 @@ void APlayerCharacter::Interact(const FInputActionValue& Value)
 
 void APlayerCharacter::ToggleMap(const FInputActionValue& Value)
 {
+}
+
+void APlayerCharacter::Pause(const FInputActionValue& Value)
+{
+	HandlePause();
 }
 
 void APlayerCharacter::BasicAttack(const FInputActionValue& Value)

@@ -48,6 +48,8 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* DodgeAction;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* PauseAction;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* ToggleMapAction;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* OverchargeAction;
@@ -196,6 +198,9 @@ public:
 	UFUNCTION(BlueprintPure)
 	int GetPlayerLevel() const { return Level; }
 
+	UFUNCTION(BlueprintImplementableEvent)
+	void HandlePause();
+
 private:
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
@@ -204,6 +209,7 @@ private:
 	void Dodge(const FInputActionValue& Value);
 	void Interact(const FInputActionValue& Value);
 	void ToggleMap(const FInputActionValue& Value);
+	void Pause(const FInputActionValue& Value);
 
 	void BasicAttack(const FInputActionValue& Value);
 	void BasicAbility(const FInputActionValue& Value);
