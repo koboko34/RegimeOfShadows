@@ -189,6 +189,13 @@ public:
 	float GetSpellSpeed() const { return SpellSpeed; }
 	float GetCooldownFactor() const { return CooldownFactor; }
 
+	UFUNCTION(BlueprintPure)
+	int GetExperience() const { return Experience; }
+	UFUNCTION(BlueprintPure)
+	int GetExperienceToNextLevel() const { return ExpToNextLevel; }
+	UFUNCTION(BlueprintPure)
+	int GetPlayerLevel() const { return Level; }
+
 private:
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);

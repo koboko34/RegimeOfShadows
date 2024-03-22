@@ -138,7 +138,7 @@ void APlayerCharacter::AddExp(int ExpToAdd)
 	UE_LOG(LogTemp, Warning, TEXT("Adding exp..."));
 	
 	Experience += ExpToAdd;
-	if (Experience > ExpToNextLevel)
+	if (Experience >= ExpToNextLevel)
 		LevelUp();
 }
 
@@ -424,7 +424,13 @@ void APlayerCharacter::LevelUp()
 {
 	Level++;
 	UE_LOG(LogTemp, Warning, TEXT("Advanced to Level %i"), Level);
+	
+	MaxHealth += 10;
+	Health = MaxHealth;
+
+	Experience -= ExpToNextLevel;
 	ExpToNextLevel *= 2;
+
 	if (Experience > ExpToNextLevel)
 		LevelUp();
 }

@@ -57,6 +57,9 @@ void AEnemy::BeginPlay()
 
 float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
+	if (!bIsAlive)
+		return DamageAmount;
+	
 	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 
 	UE_LOG(LogTemp, Warning, TEXT("Enemy Health: %i"), Health);
@@ -185,6 +188,7 @@ void AEnemy::ApplyDOT()
 void AEnemy::Death()
 {
 	bIsAlive = false;
+	GiveKillExp();
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_GameTraceChannel1, ECollisionResponse::ECR_Ignore);
 
 	AAIController* EnemyController = Cast<AAIController>(GetController());

@@ -21,6 +21,7 @@ void ABaseEntity::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 
 float ABaseEntity::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
+	/*
 	if (DamageCauser == this)
 	{
 		if (DamageAmount > Health)
@@ -33,7 +34,8 @@ float ABaseEntity::TakeDamage(float DamageAmount, FDamageEvent const& DamageEven
 		}
 		return DamageAmount;
 	}
-	
+	*/
+
 	ABaseEntity* DamagingEntity = Cast<ABaseEntity>(DamageCauser);
 	int AdjustedDamage = DamageAmount;
 	if (DamagingEntity)

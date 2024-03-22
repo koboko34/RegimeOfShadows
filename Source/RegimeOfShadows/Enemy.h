@@ -69,9 +69,12 @@ public:
 	UFUNCTION()
 	void OnHearNoise(APawn* OtherActor, const FVector& Location, float Volume);
 
+	UFUNCTION(BlueprintCallable)
+	void GiveKillExp();
+
 private:
-	UPROPERTY(VisibleAnywhere, Category = Stats, meta = (AllowPrivateAccess = true))
-	int ExpOnKill;
+	UPROPERTY(EditAnywhere, Category = Stats, meta = (AllowPrivateAccess = true))
+	int ExpOnKill = 12;
 
 	UPROPERTY(VisibleAnywhere, Category = Stats, meta = (AllowPrivateAccess = true))
 	int StatusDuration = 5;
@@ -118,9 +121,6 @@ private:
 	UMaterialInterface* FrostMaterial;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Effects, meta = (AllowPrivateAccess = true))
 	UMaterialInterface* ChargedMaterial;
-
-protected:
-	void GiveKillExp();
 
 private:
 	void CalculateKillExp();
