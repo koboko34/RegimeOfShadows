@@ -32,4 +32,11 @@ private:
 	// MUST BE SAME VALUE AS IN ABILITY COMPONENT!
 	UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = true))
 	float HeightOffset = 1000.f;
+
+	UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = true))
+	UParticleSystem* ExplosionParticleSystem;
+	UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = true))
+	USoundBase* ExplosionSound;
+	UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = true))
+	float ExplosionVolume = 0.5f;
 };

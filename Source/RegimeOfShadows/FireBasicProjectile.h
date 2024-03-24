@@ -36,6 +36,13 @@ private:
 	float TargetScale = 2.f;
 	float InitialScale;
 
+	UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = true))
+	UParticleSystem* ExplosionParticleSystem;
+	UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = true))
+	USoundBase* ExplosionSound;
+	UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = true))
+	float ExplosionVolume = 0.5f;
+
 protected:
 	virtual void BeginPlay() override;
 

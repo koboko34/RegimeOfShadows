@@ -396,13 +396,7 @@ void UAbilityComponent::ElectricChainRecursive(AActor* HitActor, TArray<AActor*>
 
 	UGameplayStatics::ApplyDamage(HitActor, ElectricChainDamage, PlayerCharacter->GetController(), PlayerCharacter, UDamageType::StaticClass());
 
-	if (!Enemy->StatusEffects.Wet)
-	{
-		Enemy->ApplyCharged();
-		return;
-	}
-
-	Enemy->ClearStatusEffects();
+	Enemy->ApplyCharged();
 
 	TArray<FHitResult> HitResults;
 	FCollisionObjectQueryParams Params;
@@ -434,7 +428,6 @@ void UAbilityComponent::ElectricChainRecursive(AActor* HitActor, TArray<AActor*>
 			continue;
 
 		ElectricChainRecursive(HitResult.GetActor(), HitActors);
-		Enemy->ClearStatusEffects();
 
 		Count++;
 

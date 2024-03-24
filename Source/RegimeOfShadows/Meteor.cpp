@@ -5,6 +5,7 @@
 #include "Components/SphereComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "AbilityComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 AMeteor::AMeteor()
 {
@@ -30,7 +31,17 @@ void AMeteor::BeginPlay()
 void AMeteor::OnCollision(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& Hit)
 {
 	TArray<FHitResult> HitResults;
-	HandleExplosion(HitResults, true, FColor::Red);
+	HandleExplosion(HitResults, false, FColor::Red);
+
+	FTransform Transform = GetActorTransform();
+	if (ExplosionParticleSystem)
+	{
+		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ExplosionParticleSystem, Transform);
+	}
+	if (ExplosionSound)
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, ExplosionSound, GetActorLocation(), ExplosionVolume);
+	}
 	
 	Destroy();
 }

@@ -118,7 +118,7 @@ void AFireBasicProjectile::Explode()
 		FCollisionShape::MakeSphere(ExplosionRadius),
 		CollisionQueryParams);
 
-	DrawDebugSphere(GetWorld(), GetActorLocation(), ExplosionRadius, 16, FColor::Red, false, 5.f);
+	// DrawDebugSphere(GetWorld(), GetActorLocation(), ExplosionRadius, 16, FColor::Red, false, 5.f);
 
 	AEnemy* Enemy;
 	for (const FHitResult& HitResult : HitResults)
@@ -142,6 +142,17 @@ void AFireBasicProjectile::Explode()
 	}
 
 	PlayerCharacter->ResetFireQProj();
+
+	FTransform Transform = GetActorTransform();
+	Transform.MultiplyScale3D(FVector(2));
+	if (ExplosionParticleSystem)
+	{
+		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ExplosionParticleSystem, Transform);
+	}
+	if (ExplosionSound)
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, ExplosionSound, GetActorLocation(), ExplosionVolume);
+	}
 
 	Destroy();
 }
