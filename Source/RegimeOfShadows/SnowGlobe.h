@@ -26,6 +26,12 @@ private:
 	UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = true))
 	float IceburnMultiplier = 2.f;
 
+	UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = true))
+	USoundBase* WindSound;
+	UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = true))
+	float WindVolume = 1.f;
+	UAudioComponent* WindSoundComponent;
+
 	float Interval = 1.f;
 	float RemainingTime;
 

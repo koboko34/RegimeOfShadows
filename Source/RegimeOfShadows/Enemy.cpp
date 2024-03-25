@@ -8,6 +8,7 @@
 #include "AIController.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "Perception/PawnSensingComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 
 AEnemy::AEnemy()
@@ -26,6 +27,8 @@ AEnemy::AEnemy()
 	RangeCheckDelegate.BindUObject(this, &AEnemy::RangeCheck);
 	
 	CalculateKillExp();
+
+	GetCharacterMovement()->MaxWalkSpeed = BaseMovementSpeed;
 
 	SetRootComponent(GetCapsuleComponent());
 	GetMesh()->SetRelativeRotation(FRotator(0.f, -90.f, 0.f));
@@ -93,6 +96,7 @@ void AEnemy::ApplyFrost()
 	ClearStatusEffects();
 	StatusEffects.Frost = true;
 	ApplyFrostMaterial();
+	GetCharacterMovement()->MaxWalkSpeed = BaseMovementSpeed * (1 - FrostSpeedDebuff);
 	GetWorldTimerManager().SetTimer(ClearFrostHandle, ClearFrostDelegate, StatusDuration, false);
 }
 
@@ -113,6 +117,7 @@ void AEnemy::ClearStatusEffects()
 	StatusEffects.Charged = false;
 	RemoveStatusMaterial();
 
+	GetCharacterMovement()->MaxWalkSpeed = BaseMovementSpeed;
 	GetWorldTimerManager().ClearAllTimersForObject(this);
 }
 
@@ -150,6 +155,7 @@ void AEnemy::ClearFrost()
 {
 	RemoveStatusMaterial();
 	StatusEffects.Frost = false;
+	GetCharacterMovement()->MaxWalkSpeed = BaseMovementSpeed;
 }
 
 void AEnemy::ClearCharged()
@@ -198,9 +204,14 @@ void AEnemy::Death()
 		EnemyController->GetBlackboardComponent()->SetValueAsBool(FName("isDead"), true);
 	}
 	
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Ignore);
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_GameTraceChannel1, ECollisionResponse::ECR_Ignore);
+
+	PawnSensingComponent->SetActive(false);
+	PawnSensingComponent->bHearNoises = false;
 	PawnSensingComponent->Deactivate();
-	DetachFromControllerPendingDestroy();
 	GetWorldTimerManager().SetTimer(DestroyHandle, DestroyDelegate, DeathDestroyDelay, false);
+	DetachFromControllerPendingDestroy();
 }
 
 void AEnemy::DestroyAfterDeath()

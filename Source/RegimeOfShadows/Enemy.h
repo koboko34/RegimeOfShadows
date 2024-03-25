@@ -39,6 +39,10 @@ public:
 
 	UPROPERTY(EditDefaultsOnly)
 	float ChaseRange = 2000.f;
+	UPROPERTY(EditDefaultsOnly)
+	float BaseMovementSpeed = 600.f;
+	UPROPERTY(EditDefaultsOnly)
+	float FrostSpeedDebuff = 0.5f;
 
 public:
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;

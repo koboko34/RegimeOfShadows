@@ -6,6 +6,7 @@
 #include "BaseEntity.h"
 #include "Kismet/GameplayStatics.h"
 #include "Enemy.h"
+#include "Components/AudioComponent.h"
 
 ASnowGlobe::ASnowGlobe()
 {
@@ -23,8 +24,11 @@ void ASnowGlobe::BeginPlay()
 	
 	RemainingTime = Lifetime;
 	GetWorldTimerManager().SetTimer(TickHandle, TickDelegate, Interval, true);
-
-	// DrawDebugSphere(GetWorld(), GetActorLocation(), Radius, 32, FColor::Cyan, false, Lifetime);
+	if (WindSound)
+	{
+		WindSoundComponent = UGameplayStatics::SpawnSoundAtLocation(this, WindSound, GetActorLocation(), FRotator::ZeroRotator, WindVolume);
+		WindSoundComponent->FadeIn(2.f, 1.f, 0.f, EAudioFaderCurve::SCurve);
+	}
 }
 
 void ASnowGlobe::HandleTick()
@@ -32,6 +36,12 @@ void ASnowGlobe::HandleTick()
 	if (RemainingTime <= 0)
 	{
 		GetWorldTimerManager().ClearAllTimersForObject(this);
+		
+		if (WindSoundComponent)
+		{
+			WindSoundComponent->FadeOut(2.f, 0.f);
+		}
+		
 		Destroy();
 		return;
 	}
