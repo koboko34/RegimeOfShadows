@@ -64,6 +64,7 @@ void ASnowGlobe::HandleTick()
 	);
 
 	APlayerCharacter* Player;
+	TArray<AActor*> HitEnemies;
 	AEnemy* Enemy;
 	for (const FHitResult& HitResult : HitResults)
 	{
@@ -75,7 +76,7 @@ void ASnowGlobe::HandleTick()
 		}
 
 		Enemy = Cast<AEnemy>(HitResult.GetActor());
-		if (!Enemy->GetIsAlive())
+		if (!Enemy->GetIsAlive() || HitEnemies.Contains(Enemy))
 			continue;
 
 		if (Enemy)
@@ -89,6 +90,7 @@ void ASnowGlobe::HandleTick()
 			UGameplayStatics::ApplyDamage(HitResult.GetActor(), DamagePerTick, PlayerController, PlayerCharacter, UDamageType::StaticClass());
 			Enemy->ApplyFrost();
 		}
+		HitEnemies.Add(Enemy);
 	}
 }
 

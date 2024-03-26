@@ -163,6 +163,11 @@ void APlayerCharacter::ResetFireQProj()
 		AbilityComponent->ActiveFireQProj = nullptr;
 }
 
+void APlayerCharacter::SetCurrentBoss(ABaseEntity* NewBoss)
+{
+	CurrentBoss = NewBoss;
+}
+
 void APlayerCharacter::Move(const FInputActionValue& Value)
 {
 	FVector2D MovementVector = Value.Get<FVector2D>();

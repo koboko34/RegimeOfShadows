@@ -150,6 +150,8 @@ private:
 	FTimerHandle StatsTickHandle;
 	FTimerDelegate StatsTickDelegate;
 
+	ABaseEntity* CurrentBoss = nullptr;
+
 public:
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 	
@@ -200,6 +202,11 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void HandlePause();
+
+	UFUNCTION(BlueprintPure)
+	ABaseEntity* GetCurrentBoss() const { return CurrentBoss; }
+	UFUNCTION(BlueprintCallable)
+	void SetCurrentBoss(ABaseEntity* NewBoss);
 
 private:
 	void Move(const FInputActionValue& Value);

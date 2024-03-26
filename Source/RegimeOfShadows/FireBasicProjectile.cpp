@@ -118,8 +118,6 @@ void AFireBasicProjectile::Explode()
 		FCollisionShape::MakeSphere(ExplosionRadius),
 		CollisionQueryParams);
 
-	// DrawDebugSphere(GetWorld(), GetActorLocation(), ExplosionRadius, 16, FColor::Red, false, 5.f);
-
 	AEnemy* Enemy;
 	for (const FHitResult& HitResult : HitResults)
 	{

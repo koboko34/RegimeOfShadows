@@ -76,6 +76,11 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void GiveKillExp();
 
+	UFUNCTION(BlueprintPure)
+	float GetMoveAcceptanceRadius() const { return MoveAcceptanceRadius; }
+	UFUNCTION(BlueprintPure)
+	float GetHearingRange() const { return HearingRange; }
+
 private:
 	UPROPERTY(EditAnywhere, Category = Stats, meta = (AllowPrivateAccess = true))
 	int ExpOnKill = 12;
@@ -95,8 +100,10 @@ private:
 	UPROPERTY(EditAnywhere, Category = Stats, meta = (AllowPrivateAccess = true))
 	float DeathDestroyDelay = 10.f;
 
-	UPROPERTY(EditDefaultsOnly, Category = AI, meta = (AllowPrivateAccess = true))
+	UPROPERTY(EditAnywhere, Category = AI, meta = (AllowPrivateAccess = true))
 	float HearingRange = 2000.f;
+	UPROPERTY(EditAnywhere, Category = AI, meta = (AllowPrivateAccess = true))
+	float MoveAcceptanceRadius = 200.f;
 
 	FTimerHandle ClearBurningHandle;
 	FTimerHandle ClearWetHandle;
