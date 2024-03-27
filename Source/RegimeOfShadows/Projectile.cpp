@@ -47,11 +47,12 @@ void AProjectile::HandleExplosion(TArray<FHitResult>& HitResultsOut, bool bDrawD
 	if (bDrawDebug)
 		DrawDebugSphere(GetWorld(), GetActorLocation(), ExplosionRadius, 16, Colour, false, 5.f);
 
+	TArray<AActor*> HitEnemies;
 	AEnemy* Enemy;
 	for (const FHitResult& HitResult : HitResults)
 	{
 		Enemy = Cast<AEnemy>(HitResult.GetActor());
-		if (!Enemy || !Enemy->GetIsAlive())
+		if (!Enemy || !Enemy->GetIsAlive() || HitEnemies.Contains(Enemy))
 			continue;
 
 		UGameplayStatics::ApplyDamage(
@@ -60,5 +61,7 @@ void AProjectile::HandleExplosion(TArray<FHitResult>& HitResultsOut, bool bDrawD
 			PlayerController,
 			PlayerCharacter,
 			UDamageType::StaticClass());
+
+		HitEnemies.Add(Enemy);
 	}
 }

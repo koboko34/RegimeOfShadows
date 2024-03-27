@@ -81,15 +81,17 @@ void AElectricPortal::Sweep()
 		1.f
 	);
 
+	TArray<AActor*> HitEnemies;
 	AEnemy* Enemy;
 	for (const FHitResult& HitResult : HitResults)
 	{
 		Enemy = Cast<AEnemy>(HitResult.GetActor());
-		if (!Enemy)
+		if (!Enemy || HitEnemies.Contains(Enemy))
 		{
 			continue;
 		}
 
+		HitEnemies.Add(Enemy);
 		if (Enemy->StatusEffects.Burning)
 		{
 			UGameplayStatics::ApplyDamage(

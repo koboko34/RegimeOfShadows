@@ -449,7 +449,7 @@ void APlayerCharacter::LevelUp()
 void APlayerCharacter::StatsTick()
 {
 	if (!bSprinting)
-		Stamina = std::min(MaxStamina, (int)Stamina + 2);
+		Stamina = std::min(MaxStamina, (int)Stamina + StaminaPerTick);
 	
 	if (bRecoverMana)
 		Mana = std::min(MaxMana, Mana + ManaPerTick);

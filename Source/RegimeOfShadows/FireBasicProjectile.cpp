@@ -118,13 +118,15 @@ void AFireBasicProjectile::Explode()
 		FCollisionShape::MakeSphere(ExplosionRadius),
 		CollisionQueryParams);
 
+	TArray<AActor*> HitEnemies;
 	AEnemy* Enemy;
 	for (const FHitResult& HitResult : HitResults)
 	{
 		Enemy = Cast<AEnemy>(HitResult.GetActor());
-		if (!Enemy)
+		if (!Enemy || HitEnemies.Contains(Enemy))
 			continue;
 
+		HitEnemies.Add(Enemy);
 		float AdjustedDamageToDeal = Enemy->StatusEffects.Charged ? DamageToDeal * GrowthFactor * PlayerCharacter->GetAbilityComponent()->OverloadedMultiplier
 			: DamageToDeal * GrowthFactor;
 

@@ -76,7 +76,7 @@ void ASnowGlobe::HandleTick()
 		}
 
 		Enemy = Cast<AEnemy>(HitResult.GetActor());
-		if (!Enemy->GetIsAlive() || HitEnemies.Contains(Enemy))
+		if (!Enemy || !Enemy->GetIsAlive() || HitEnemies.Contains(Enemy))
 			continue;
 
 		if (Enemy)

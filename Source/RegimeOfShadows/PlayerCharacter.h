@@ -134,6 +134,8 @@ private:
 	float RemainingTimeDOT;
 	UPROPERTY(EditDefaultsOnly, Category = Other, meta = (AllowPrivateAccess = true))
 	int ManaPerTick = 5;
+	UPROPERTY(EditDefaultsOnly, Category = Other, meta = (AllowPrivateAccess = true))
+	int StaminaPerTick = 5;
 	bool bRecoverMana = false;
 	
 	bool bStrongAbilityDown = false;

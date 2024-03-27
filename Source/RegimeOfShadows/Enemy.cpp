@@ -195,7 +195,6 @@ void AEnemy::Death()
 {
 	bIsAlive = false;
 	GiveKillExp();
-	GetCapsuleComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_GameTraceChannel1, ECollisionResponse::ECR_Ignore);
 
 	AAIController* EnemyController = Cast<AAIController>(GetController());
 	if (EnemyController)
@@ -206,6 +205,7 @@ void AEnemy::Death()
 	
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Ignore);
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_GameTraceChannel1, ECollisionResponse::ECR_Ignore);
+	GetMesh()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Block);
 
 	PawnSensingComponent->SetActive(false);
 	PawnSensingComponent->bHearNoises = false;
